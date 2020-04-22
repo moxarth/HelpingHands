@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#C2002F</color> <!-- top bar-->
+    <color name="colorPrimaryDark">#A0002F</color><!-- mobile nav bar-->
+    <color name="colorAccent">#C2002F</color><!-- checkbox -->
+</resources>

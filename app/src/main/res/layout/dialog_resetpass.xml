@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/oldpass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="63dp"
+        android:layout_marginRight="63dp"
+        android:ems="10"
+        android:hint="Old Password"
+        android:inputType="textPassword"
+        android:paddingTop="20sp"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/newpass"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="63dp"
+        android:layout_marginRight="63dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="New Password"
+        android:inputType="textPassword"
+        android:paddingTop="15sp"
+        android:textSize="16sp" />
+</LinearLayout>

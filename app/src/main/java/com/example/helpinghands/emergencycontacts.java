@@ -86,7 +86,7 @@ public class emergencycontacts extends AppCompatActivity {
         name3 = (EditText) findViewById(R.id.editText06);
         contact3 = (EditText) findViewById(R.id.editText04);
         button = (Button) findViewById(R.id.button2);
-        final String options[] = new String[]{"Parent", "Child", "Sibling", "Relative", "Neighbour", "Friend", "Other"};
+        final String options[] = new String[]{"Parent", "Child", "Sibling", "Husband/Wife","Relative", "Neighbour", "Friend", "Other"};
         final ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         choice1.setAdapter(adapter);

@@ -166,6 +166,7 @@
                     android:layout_width="93dp"
                     android:layout_height="48dp"
                     android:hint=" Country"
+                    
                     android:inputType="textShortMessage"
                     android:layout_marginTop="@dimen/activity_horizontal_margin"
                     android:layout_marginBottom="@dimen/activity_horizontal_margin" />

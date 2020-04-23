@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.helpinghands.BackgroundService;
 import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
@@ -78,6 +79,8 @@ public class RequestsFragment extends Fragment{
                 }
             }
         });
+
+
     }
 
     private static final String TAG = "RequestLOG";
@@ -91,7 +94,8 @@ public class RequestsFragment extends Fragment{
                 ViewModelProviders.of(this).get(RequestsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
 
-
+        Intent in = new Intent(getActivity(), BackgroundService.class);
+        getActivity().startService(in);
 
         return root;
     }

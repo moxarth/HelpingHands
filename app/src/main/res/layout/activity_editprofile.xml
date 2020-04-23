@@ -133,6 +133,7 @@
                     android:background="#e3e3e3"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
+                    android:gravity="center"
                     android:hint=" Contact No."
                     android:inputType="none" />
 

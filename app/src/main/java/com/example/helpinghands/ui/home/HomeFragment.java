@@ -47,9 +47,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -130,6 +132,7 @@ public class HomeFragment extends Fragment {
     }
 
     public void updateLocality(User myuser,Address myaddress){
+        myuser.setlcity(myaddress.getLocality());
         Log.v(TAG,"Setting Locality: "+myaddress.getLocality());
         db.collection("user_details").document(myuser.getUserid()).update("lcity",myaddress.getLocality());
     }
@@ -558,13 +561,14 @@ public class HomeFragment extends Fragment {
                         final FirebaseFirestore db = FirebaseFirestore.getInstance();
                         Map<String, Object> ERequest = new HashMap<>();
                         ERequest.put("ContactNumber", user.getContactnumber());
-                        ERequest.put("Type", "Medical");
-                        ERequest.put("Level", "Critical");
+                        ERequest.put("Status", "ongoing");
+                        ERequest.put("VolunteerID", "");
+                        ERequest.put("VolunteerNo",0);
                         ERequest.put("Latitude", user.getLatitude());
                         ERequest.put("Longitude", user.getLongitude());
-                        Address address = findLocality(cur_position);
-                        ERequest.put("lcity", address.getLocality());
+                        ERequest.put("lcity", user.getlcity());
                         ERequest.put("userId", user.getUserid());
+                        ERequest.put("created", FieldValue.serverTimestamp());
                         db.collection("emergency_Requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {

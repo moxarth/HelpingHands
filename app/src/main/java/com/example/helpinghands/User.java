@@ -31,6 +31,17 @@ public class User {
     private String latitude;
     private String longitude;
     private int sosflag;
+    private String lcity;
+
+    public String getlcity() {
+        lcity = sharedPreferences.getString("lcity","");
+        return lcity;
+    }
+
+    public void setlcity(String lcity) {
+        this.lcity = lcity;
+        sharedPreferences.edit().putString("lcity",lcity).commit();
+    }
 
     public int getSosflag() {
         sosflag = sharedPreferences.getInt("sosflag",0);

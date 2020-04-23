@@ -61,6 +61,7 @@ import javax.annotation.Nullable;
 import static java.lang.Thread.currentThread;
 
 public class RequestsFragment extends Fragment{
+    static User user ;
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Incoming Request Notification";
@@ -91,7 +92,7 @@ public class RequestsFragment extends Fragment{
     }
     public static void listenRequests(final Context context){
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("emergency_Requests").whereEqualTo("lcity","Mahuva").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("emergency_Requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","ongoing").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -127,14 +128,18 @@ public class RequestsFragment extends Fragment{
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        user = new User(getActivity());
         requestsViewModel =
                 ViewModelProviders.of(this).get(RequestsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
         FragmentActivity myactivity = getActivity();
         createNotificationChannel();
+
+        //notifyUser(getContext(),myactivity);
+
         //Intent in = new Intent(getActivity(), BackgroundService.class);
         //getActivity().startService(in);
-        notifyUser(getContext(),myactivity);
+
 
         return root;
     }

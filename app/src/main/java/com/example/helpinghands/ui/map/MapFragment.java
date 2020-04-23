@@ -304,6 +304,7 @@ public class MapFragment extends Fragment {
     }
 
     public void updateLocality(User myuser,Address myaddress){
+        myuser.setlcity(myaddress.getLocality());
         Log.v(TAG,"Setting Locality: "+myaddress.getLocality());
         db.collection("user_details").document(myuser.getUserid()).update("lcity",myaddress.getLocality());
     }

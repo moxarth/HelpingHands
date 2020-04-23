@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,8 +32,11 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.helpinghands.BackgroundService;
 import com.example.helpinghands.MainActivity;
@@ -48,6 +52,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.annotation.Nullable;
 
@@ -57,8 +63,8 @@ import static java.lang.Thread.currentThread;
 public class RequestsFragment extends Fragment{
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            String description = getString(R.string.app_name);
+            CharSequence name = "Incoming Request Notification";
+            String description = "Notification for Incoming Emergency Request";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel("001", name, importance);
             channel.setDescription(description);
@@ -67,15 +73,21 @@ public class RequestsFragment extends Fragment{
         }
     }
 
-    public static void notifyUser(Context context){
+    public static void notifyUser(Context context,FragmentActivity myactivity){
+        Date currentTime = Calendar.getInstance().getTime();
+        String time = currentTime.getHours()+" : "+currentTime.getMinutes();
+
+        NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
+        PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"001")
                 .setSmallIcon(R.drawable.ic_helpinghands)
                 .setContentTitle("Incoming Request")
-                .setContentText("Someone within your area needs help")
+                .setContentText("Someone within your area needs your help")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
+                .setContentIntent(pendingIntent);
         NotificationManagerCompat nm = NotificationManagerCompat.from(context);
-        nm.notify(0,builder.build());
+        nm.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()),builder.build());
     }
     public static void listenRequests(final Context context){
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -83,7 +95,6 @@ public class RequestsFragment extends Fragment{
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
-
                     return;
                 }
 
@@ -119,10 +130,11 @@ public class RequestsFragment extends Fragment{
         requestsViewModel =
                 ViewModelProviders.of(this).get(RequestsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
+        FragmentActivity myactivity = getActivity();
         createNotificationChannel();
-        Intent in = new Intent(getActivity(), BackgroundService.class);
-        getActivity().startService(in);
-
+        //Intent in = new Intent(getActivity(), BackgroundService.class);
+        //getActivity().startService(in);
+        notifyUser(getContext(),myactivity);
 
         return root;
     }

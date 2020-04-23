@@ -72,7 +72,7 @@ public class HomeFragment extends Fragment {
             CharSequence name = getString(R.string.app_name);
             String description = getString(R.string.app_name);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("001", name, importance);
+            NotificationChannel channel = new NotificationChannel("002", name, importance);
             channel.setDescription(description);
             NotificationManager notificationManager = getActivity().getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);

@@ -102,7 +102,7 @@ public class MapFragment extends Fragment {
     static Circle circle;
     private static final String TAG = "MapLOG";
     static int focus = 1;
-    static int testing;
+    static int testing123;
     public MapFragment(){}
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {

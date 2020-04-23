@@ -21,7 +21,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_horizontal_margin"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -36,10 +36,27 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="293dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="28dp"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
+                    android:text="Register yourself by providing required details below"
+                    android:textSize="22dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
                 <EditText
                     android:id="@+id/editText"
                     android:layout_width="140dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:ems="10"
                     android:hint=" First Name"
@@ -48,7 +65,7 @@
                 <EditText
                     android:id="@+id/lastname"
                     android:layout_width="140dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_vertical_margin"
                     android:ems="10"
                     android:hint=" Last Name"
@@ -64,7 +81,7 @@
                 <EditText
                     android:id="@+id/editText2"
                     android:layout_width="300dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:ems="10"
                     android:hint=" Password"
@@ -80,7 +97,7 @@
                 <EditText
                     android:id="@+id/email"
                     android:layout_width="300dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:ems="10"
                     android:hint=" Email Address"
@@ -97,7 +114,7 @@
                 <EditText
                     android:id="@+id/editText3"
                     android:layout_width="190dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:ems="10"
                     android:hint=" Contact No."
@@ -106,7 +123,7 @@
                 <EditText
                     android:id="@+id/age"
                     android:layout_width="90dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:ems="10"
                     android:hint=" Age"
@@ -123,7 +140,7 @@
                 <EditText
                     android:id="@+id/addressl1"
                     android:layout_width="300dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:hint=" Address Line 1" />
 
@@ -138,7 +155,7 @@
                 <EditText
                     android:id="@+id/addressl2"
                     android:layout_width="300dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:hint=" Address Line 2" />
             </LinearLayout>
@@ -152,7 +169,7 @@
                 <EditText
                     android:id="@+id/city"
                     android:layout_width="93dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/activity_horizontal_margin"
                     android:layout_marginBottom="@dimen/activity_horizontal_margin"
                     android:hint=" City"
@@ -161,7 +178,7 @@
                 <EditText
                     android:id="@+id/state"
                     android:layout_width="94dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="@dimen/activity_horizontal_margin"
                     android:hint=" State"
                     android:inputType="textShortMessage" />
@@ -169,7 +186,7 @@
                 <EditText
                     android:id="@+id/country"
                     android:layout_width="93dp"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/activity_horizontal_margin"
                     android:layout_marginBottom="@dimen/activity_horizontal_margin"
                     android:hint=" Country"
@@ -186,8 +203,8 @@
 
                 <TextView
                     android:id="@+id/textView12"
-                    android:layout_width="96dp"
-                    android:layout_height="43dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:text="  Gender  : "
                     android:textSize="18sp" />

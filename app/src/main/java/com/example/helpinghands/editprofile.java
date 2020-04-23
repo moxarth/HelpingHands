@@ -48,7 +48,7 @@ public class editprofile extends AppCompatActivity {
     private CheckBox type;
     private RadioButton gender;
     private RadioButton gender2;
-
+    private EditText contactno;
     @Override
     public void onBackPressed(){
         super.onBackPressed();
@@ -79,7 +79,7 @@ public class editprofile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editprofile);
         final User user = new User(this);
-
+        contactno = (EditText)findViewById(R.id.editText3);
         button = (Button)findViewById(R.id.button);
         username = (EditText)findViewById(R.id.editText);
         username2 = (EditText)findViewById(R.id.lastname);
@@ -95,6 +95,7 @@ public class editprofile extends AppCompatActivity {
         type=(CheckBox)findViewById(R.id.checkBox);
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        contactno.setText(Long.toString(user.getContactnumber()));
         username.setText(user.getFName());
         username2.setText(user.getLName());
         email.setText(user.getEmail());

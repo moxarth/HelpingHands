@@ -497,24 +497,33 @@ public class HomeFragment extends Fragment {
         test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final User user = new User(getActivity());
-                final FirebaseFirestore db = FirebaseFirestore.getInstance();
-                Map<String, Object> ERequest = new HashMap<>();
-                ERequest.put("ContactNumber", user.getContactnumber());
-                ERequest.put("Type","Medical");
-                ERequest.put("Level","Critical");
-                ERequest.put("Latitude","21.087510");
-                ERequest.put("Longitude","71.760829");
-                LatLng cur_position = new LatLng(new Double(21.087510),new Double(71.760829));
-                Address address = findLocality(cur_position);
-                ERequest.put("lcity",address.getLocality());
-                ERequest.put("userId",user.getUserid());
-                db.collection("emergency_Requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(getActivity(), "Request Broadcasted", Toast.LENGTH_SHORT).show();
+                if(user.getLatitude() != "" && user.getLongitude() != "") {
+                    if (!checkInternetStatus()) { Internet_DisableAlert(); }
+                    else {
+                        final User user = new User(getActivity());
+                        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        Map<String, Object> ERequest = new HashMap<>();
+                        ERequest.put("ContactNumber", user.getContactnumber());
+                        ERequest.put("Type", "Medical");
+                        ERequest.put("Level", "Critical");
+                        ERequest.put("Latitude", user.getLatitude());
+                        ERequest.put("Longitude", user.getLongitude());
+                        Address address = findLocality(cur_position);
+                        ERequest.put("lcity", address.getLocality());
+                        ERequest.put("userId", user.getUserid());
+                        db.collection("emergency_Requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                });
+                }
+                else{
+                    Intent in = new Intent(getActivity(),MainActivity.class);
+                    startActivity(in);
+                    ((Activity)getContext()).overridePendingTransition(0,0);
+                }
             }
         });
 

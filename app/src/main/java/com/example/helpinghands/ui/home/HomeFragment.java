@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
@@ -60,8 +61,11 @@ public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
     private Button button;
-    private Button make_call;
-    private Button test;
+    private ImageButton call100;
+    private ImageButton call108;
+    private ImageButton call101;
+
+    private ImageButton test;
     private ToggleButton sosalert;
     int cntflag = 0;
     static  LatLng cur_position;
@@ -193,7 +197,29 @@ public class HomeFragment extends Fragment {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.v("request_status","accepted");
-                    make_call.callOnClick();
+                    call100.callOnClick();
+                } else {
+                    Log.v("request_status","rejected");
+                }
+                return;
+            }
+
+            case 124: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.v("request_status","accepted");
+                    call108.callOnClick();
+                } else {
+                    Log.v("request_status","rejected");
+                }
+                return;
+            }
+
+            case 125: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.v("request_status","accepted");
+                    call101.callOnClick();
                 } else {
                     Log.v("request_status","rejected");
                 }
@@ -253,9 +279,9 @@ public class HomeFragment extends Fragment {
         Toast.makeText(getActivity(),"Emergency contacts have been notified via text message",Toast.LENGTH_SHORT).show();
     }
 
-    public void makecall(User user){
+    public void makecall(User user,String number){
         Intent callIntent =new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:100"));
+        callIntent.setData(Uri.parse("tel:"+number));
         startActivity(callIntent);
     }
 
@@ -381,7 +407,9 @@ public class HomeFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         user = new User(getActivity());
         button = root.findViewById(R.id.button4);
-        make_call = root.findViewById(R.id.button7);
+        call100 = root.findViewById(R.id.button7);
+        call108 = root.findViewById(R.id.imageButton);
+        call101 = root.findViewById(R.id.imageButton2);
         test = root.findViewById(R.id.button8);
         sosalert = root.findViewById(R.id.toggleButton);
         if(user.getSosflag() == 1){sosalert.setChecked(true);}
@@ -404,7 +432,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        make_call.setOnClickListener(new View.OnClickListener() {
+        call100.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED){
@@ -412,7 +440,33 @@ public class HomeFragment extends Fragment {
                     requestPermissions(new String[]{Manifest.permission.CALL_PHONE},120);
                 }
                 else{
-                    makecall(user);
+                    makecall(user,"100");
+                }
+            }
+        });
+
+        call108.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED){
+                    Log.v("status", "asking for permission");
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE},124);
+                }
+                else{
+                    makecall(user,"108");
+                }
+            }
+        });
+
+        call101.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED){
+                    Log.v("status", "asking for permission");
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE},125);
+                }
+                else{
+                    makecall(user,"101");
                 }
             }
         });

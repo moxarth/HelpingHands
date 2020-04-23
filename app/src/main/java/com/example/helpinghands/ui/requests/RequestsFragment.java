@@ -23,7 +23,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -36,9 +35,17 @@ import com.example.helpinghands.User;
 import com.example.helpinghands.editprofile;
 import com.example.helpinghands.login;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+import javax.annotation.Nullable;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 import static java.lang.Thread.currentThread;
 
 public class RequestsFragment extends Fragment{
@@ -51,6 +58,34 @@ public class RequestsFragment extends Fragment{
         requestsViewModel =
                 ViewModelProviders.of(this).get(RequestsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
+
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("emergency_Requests").whereEqualTo("lcity","Mahuva").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    //Log.w(TAG, "listen:error", e);
+                    return;
+                }
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            Log.d(TAG, "New city: " + dc.getDocument().getData());
+                            Toast.makeText(getActivity(), "Added", Toast.LENGTH_SHORT).show();
+                            break;
+                        case MODIFIED:
+                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                            Toast.makeText(getActivity(), "Modified", Toast.LENGTH_SHORT).show();
+                            break;
+                        case REMOVED:
+                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+                            Toast.makeText(getActivity(), "Removed", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }
+        });
 
         return root;
     }

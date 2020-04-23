@@ -508,7 +508,8 @@ public class HomeFragment extends Fragment {
                 LatLng cur_position = new LatLng(new Double(21.087510),new Double(71.760829));
                 Address address = findLocality(cur_position);
                 ERequest.put("lcity",address.getLocality());
-                db.collection("Emergency_Requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                ERequest.put("userId",user.getUserid());
+                db.collection("emergency_Requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Toast.makeText(getActivity(), "Request Broadcasted", Toast.LENGTH_SHORT).show();

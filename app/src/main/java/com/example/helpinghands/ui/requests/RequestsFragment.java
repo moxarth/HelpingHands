@@ -1,6 +1,7 @@
 package com.example.helpinghands.ui.requests;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -90,6 +91,7 @@ public class RequestsFragment extends Fragment{
         NotificationManagerCompat nm = NotificationManagerCompat.from(context);
         nm.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()),builder.build());
     }
+
     public static void listenRequests(final Context context){
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("emergency_Requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","ongoing").addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -98,7 +100,6 @@ public class RequestsFragment extends Fragment{
                 if (e != null) {
                     return;
                 }
-
                 for (DocumentChange dc : snapshots.getDocumentChanges()) {
                     switch (dc.getType()) {
                         case ADDED:
@@ -117,13 +118,8 @@ public class RequestsFragment extends Fragment{
                 }
             }
         });
-
-
     }
-
     private static final String TAG = "RequestLOG";
-    static Location mlocation;
-    LocationManager locationManager;
     private RequestsViewModel requestsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -134,17 +130,68 @@ public class RequestsFragment extends Fragment{
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
         FragmentActivity myactivity = getActivity();
         createNotificationChannel();
-
+        String[] requestId = new String[]{"abc","def","ghi","uuu"};
+        String[] timestamp = new String[]{"hhh","hhh","hhh","uuu"};
+        String[] latitude = new String[]{"fff","fff","fff","uuu"};
+        String[] longitude = new String[]{"hhh","hhh","hhh","uuu"};
+        String[] status = new String[]{"lll","lll","lll","uuu"};
+        String[] volunteerno = new String[]{"ttt","ttt","ttt","uuu"};
+        final ListView list = root.findViewById(R.id.reqlist);
+        MyCustomListAdapter adapter = new MyCustomListAdapter(getActivity(),requestId,timestamp,latitude,longitude,status,volunteerno);
+        list.setAdapter(adapter);
         //notifyUser(getContext(),myactivity);
 
         //Intent in = new Intent(getActivity(), BackgroundService.class);
         //getActivity().startService(in);
-
+       // listenRequests(getContext());
 
         return root;
     }
 
+}
 
+class MyCustomListAdapter extends ArrayAdapter {
 
+    private final Activity context;
+    private final String[] requestId;
+    private final String[] timestamp;
+    private final String[] latitude;
+    private final String[] longitude;
+    private final String[] status;
+    private final String[] volunteerno;
+
+    public MyCustomListAdapter(Activity context,String[] requestId, String[] timestamp, String[] latitude,String[] longitude,String[] status,String[] volunteerno){
+
+        super(context,R.layout.requestlist , requestId);
+        this.context=context;
+        this.requestId = requestId;
+        this.timestamp = timestamp;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.status = status;
+        this.volunteerno = volunteerno;
+    }
+
+    public View getView(int position, View view, ViewGroup parent) {
+        LayoutInflater inflater=context.getLayoutInflater();
+        View rowView=inflater.inflate(R.layout.requestlist, null,true);
+
+        TextView requestIdtext = (TextView) rowView.findViewById(R.id.requestid);
+        TextView timestamptext = (TextView) rowView.findViewById(R.id.timestamp);
+        TextView statustext = (TextView) rowView.findViewById(R.id.status);
+        TextView latitudetext = (TextView) rowView.findViewById(R.id.latitude);
+        TextView longitudetext = (TextView) rowView.findViewById(R.id.longitude);
+        TextView volunteertext = (TextView) rowView.findViewById(R.id.volunteerno);
+
+        requestIdtext.setText(requestId[position]);
+        timestamptext.setText(timestamp[position]);
+        statustext.setText(latitude[position]);
+        latitudetext.setText(longitude[position]);
+        longitudetext.setText(status[position]);
+        volunteertext.setText(volunteerno[position]);
+
+        return rowView;
+
+    };
 
 }

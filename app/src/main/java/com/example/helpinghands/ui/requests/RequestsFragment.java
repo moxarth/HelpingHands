@@ -83,7 +83,7 @@ public class RequestsFragment extends Fragment{
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
-                    //Log.w(TAG, "listen:error", e);
+                    
                     return;
                 }
 

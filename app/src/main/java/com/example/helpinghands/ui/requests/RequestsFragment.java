@@ -45,20 +45,12 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
+
 import static java.lang.Thread.currentThread;
 
 public class RequestsFragment extends Fragment{
-    static Location mlocation;
-    LocationManager locationManager;
-    private RequestsViewModel requestsViewModel;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        requestsViewModel =
-                ViewModelProviders.of(this).get(RequestsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_requests, container, false);
-
+    public static void listenRequests(final Context context){
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("emergency_Requests").whereEqualTo("lcity","Mahuva").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -72,20 +64,34 @@ public class RequestsFragment extends Fragment{
                     switch (dc.getType()) {
                         case ADDED:
                             Log.d(TAG, "New city: " + dc.getDocument().getData());
-                            Toast.makeText(getActivity(), "Added", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
                             break;
                         case MODIFIED:
                             Log.d(TAG, "Modified city: " + dc.getDocument().getData());
-                            Toast.makeText(getActivity(), "Modified", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Modified", Toast.LENGTH_SHORT).show();
                             break;
                         case REMOVED:
                             Log.d(TAG, "Removed city: " + dc.getDocument().getData());
-                            Toast.makeText(getActivity(), "Removed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }
             }
         });
+    }
+
+    private static final String TAG = "RequestLOG";
+    static Location mlocation;
+    LocationManager locationManager;
+    private RequestsViewModel requestsViewModel;
+
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        requestsViewModel =
+                ViewModelProviders.of(this).get(RequestsViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_requests, container, false);
+
+
 
         return root;
     }

@@ -5,9 +5,15 @@ import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,10 +33,24 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
 import com.example.helpinghands.emergencycontacts;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 public class HomeFragment extends Fragment {
 
@@ -40,6 +60,9 @@ public class HomeFragment extends Fragment {
     private Button test;
     private ToggleButton sosalert;
     int cntflag = 0;
+    static  LatLng cur_position;
+    LocationManager locationManager;
+    private static final String TAG = "HomeLOG";
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.app_name);
@@ -51,10 +74,103 @@ public class HomeFragment extends Fragment {
             notificationManager.createNotificationChannel(channel);
         }
     }
+    static FirebaseFirestore db;
+    static Address address;
+    static User user;
+
+    public LatLng locationfetch(){
+        locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        final Location currentLoc;
+        if (ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},123);
+        }
+        currentLoc = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+        Log.v(TAG,"Last known location(NETWORK): " + currentLoc);
+        if(currentLoc == null){ return  new LatLng(0,0); }
+        else{return new LatLng(currentLoc.getLatitude(),currentLoc.getLongitude());}
+    }
+
+    public void setUserLocation(User myuser,LatLng my_position){
+        Log.v(TAG,"Setting User location: "+my_position);
+        myuser.setLatitude(Double.toString(my_position.latitude));
+        myuser.setLongitude(Double.toString(my_position.longitude));
+        db.collection("user_details").document(myuser.getUserid()).update("latitude",my_position.latitude, "longitude",my_position.longitude).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.v(TAG,"ERROR UPDATING LOCATION IN DATABASE");
+                Intent in = new Intent(getActivity(), MainActivity.class);
+                startActivity(in);
+            }
+        });
+    }
+
+    public Address findLocality(LatLng my_position){
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+        Address myaddress = null;
+        try {
+            List<Address> addressList = geocoder.getFromLocation(
+                    my_position.latitude, my_position.longitude, 1);
+            if (addressList != null && addressList.size() > 0) {
+                myaddress = addressList.get(0);
+                Log.v(TAG,"Finding Locality: "+myaddress.getLocality());
+            }
+        } catch (IOException e) {
+            myaddress = null;
+            Log.e(TAG, "Unable to connect to Geocoder(locality error)", e);
+        }
+        return myaddress;
+    }
+
+    public void updateLocality(User myuser,Address myaddress){
+        Log.v(TAG,"Setting Locality: "+myaddress.getLocality());
+        db.collection("user_details").document(myuser.getUserid()).update("lcity",myaddress.getLocality());
+    }
+
+    public void GPS_DisableAlert(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage("It seems GPS is disabled. You need to enable GPS location to access map")
+                .setCancelable(false)
+                .setPositiveButton("Turn on", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public boolean checkInternetStatus(){
+        boolean status = false;
+        try {
+            final String command = "ping -c 1 google.com";
+            status = (Runtime.getRuntime().exec(command).waitFor() == 0);
+            Log.v(TAG, "Network Status: " + status);
+        } catch (Exception e) {
+            Log.e(TAG,"Network Error: "+e.toString());
+        }
+        return status;
+    }
+
+    public void Internet_DisableAlert(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setTitle("No Internet Connection");
+        builder.setMessage("Internet Connection is required to perform the following task.");
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
+    }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case 122: {
                 if (grantResults.length > 0
@@ -76,6 +192,19 @@ public class HomeFragment extends Fragment {
                     make_call.callOnClick();
                 } else {
                     Log.v("request_status","rejected");
+                }
+                return;
+            }
+            case 123: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.v(TAG,"Location permission granted");
+                    locationfetch();
+                    Intent in = new Intent(getContext(),MainActivity.class);
+                    startActivity(in);
+                    ((Activity)getContext()).overridePendingTransition(0,0);
+                } else {
+                    Log.v(TAG,"Location permission rejected");
                 }
                 return;
             }
@@ -126,50 +255,133 @@ public class HomeFragment extends Fragment {
         startActivity(callIntent);
     }
 
-
     public void initiate_emergency(User user){
         final User myuser = user;
         Thread sos = new Thread(){
             public void run(){
-                    Log.v("SOSThread","Thread Started");
-                    new CountDownTimer(5000,1000){
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            if(myuser.getSosflag() == 0){this.cancel();Log.v("SOSThread","Thread Ended");}
+                Log.v("SOSThread","Thread Started");
+                new CountDownTimer(5000,1000){
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        if(myuser.getSosflag() == 0){this.cancel();Log.v("SOSThread","Thread Ended");}
+                    }
+                    @Override
+                    public void onFinish() {
+                        if(myuser.getLatitude() != "" && myuser.getLongitude() != ""){
+                            String lastloc = "Last Known Location is in this area :\n";
+                            lastloc = lastloc + "https://www.google.com/maps/@"+myuser.getLatitude()+","+myuser.getLongitude()+",18z";
+                            Log.v("SOSThread","Sending Message = "+lastloc);
+                            if(myuser.getEcon1()!=0){sendsms(myuser.getEcon1().toString(),lastloc);}
+                            if(myuser.getEcon2()!=0){sendsms(myuser.getEcon2().toString(),lastloc);}
+                            if(myuser.getEcon3()!=0){sendsms(myuser.getEcon3().toString(),lastloc);}
                         }
-                        @Override
-                        public void onFinish() {
-                            if(myuser.getLatitude() != "" && myuser.getLongitude() != ""){
-                                String lastloc = "Last Known Location is in this area :\n";
-                                lastloc = lastloc + "https://www.google.com/maps/@"+myuser.getLatitude()+","+myuser.getLongitude()+",18z";
-                                Log.v("SOSThread","Sending Message = "+lastloc);
-                                if(myuser.getEcon1()!=0){sendsms(myuser.getEcon1().toString(),lastloc);}
-                                if(myuser.getEcon2()!=0){sendsms(myuser.getEcon2().toString(),lastloc);}
-                                if(myuser.getEcon3()!=0){sendsms(myuser.getEcon3().toString(),lastloc);}
-                            }
-                            Log.v("SOSThread","SOS flag = "+myuser.getSosflag());
-                            if(myuser.getSosflag() == 1){this.start();}
-                        }
-                    }.start();
+                        Log.v("SOSThread","SOS flag = "+myuser.getSosflag());
+                        if(myuser.getSosflag() == 1){this.start();}
+                    }
+                }.start();
             }
         };
         sos.run();
     }
 
+    public void fetchlocation(){
+
+        final ProgressDialog progressBar1;
+        progressBar1 = new ProgressDialog(getContext());
+        progressBar1.setMessage("Finding current location...");
+        progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar1.setCancelable(true);
+        progressBar1.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+            }
+        });
+
+        Log.v(TAG,"Initializing fetch location thread");
+
+        if (!checkInternetStatus()) { Internet_DisableAlert(); }
+        else{
+            locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+            }
+            else{
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { GPS_DisableAlert(); }
+                else{
+                    cur_position = locationfetch();
+                    if(cur_position.latitude == 0){
+
+                        progressBar1.show();
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+                            @Override
+                            public void onLocationChanged(Location location) {
+                                locationManager.removeUpdates(this);
+                                Log.v(TAG,"current location: "+location);
+                                cur_position = new LatLng(location.getLatitude(),location.getLongitude());
+                                setUserLocation(user, cur_position);
+                                address = findLocality(cur_position);
+                                updateLocality(user, address);
+                                progressBar1.dismiss();
+                            }
+                            @Override
+                            public void onStatusChanged(String provider, int status, Bundle extras) {}
+                            @Override
+                            public void onProviderEnabled(String provider) {}
+                            @Override
+                            public void onProviderDisabled(String provider) {}
+                        });
+                    }
+                    else{
+                        setUserLocation(user, cur_position);
+                        address = findLocality(cur_position);
+                        updateLocality(user, address);
+                    }
+
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+                        @Override
+                        public void onLocationChanged(Location location) {
+                            progressBar1.dismiss();
+                            if (cur_position.latitude == location.getLatitude() && cur_position.longitude == location.getLongitude()) {
+                                Log.v(TAG, "Location updated (SAME VALUE)");
+                            } else {
+                                cur_position = new LatLng(location.getLatitude(), location.getLongitude());
+                                setUserLocation(user, cur_position);
+                                Log.v(TAG, "Location updated: " + location.getLatitude() + ", " + location.getLongitude());
+                            }
+                        }
+                        @Override
+                        public void onStatusChanged(String provider, int status, Bundle extras) {}
+                        @Override
+                        public void onProviderEnabled(String provider) {}
+                        @Override
+                        public void onProviderDisabled(String provider) {}
+                    });
+                }
+            }
+
+        }
+    }
+
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        final User user = new User(getActivity());
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final LayoutInflater myinflater = inflater;
         final ViewGroup mycontainer = container;
         createNotificationChannel();
+        db = FirebaseFirestore.getInstance();
+        user = new User(getActivity());
         button = root.findViewById(R.id.button4);
         make_call = root.findViewById(R.id.button7);
         test = root.findViewById(R.id.button8);
         sosalert = root.findViewById(R.id.toggleButton);
         if(user.getSosflag() == 1){sosalert.setChecked(true);}
+        fetchlocation();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -200,12 +412,7 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //MapFragment.generateEmergency();
-            }
-        });
+
         sosalert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -282,6 +489,14 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+
+        test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         return root;
     }
 }

@@ -44,11 +44,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -493,7 +497,23 @@ public class HomeFragment extends Fragment {
         test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                final User user = new User(getActivity());
+                final FirebaseFirestore db = FirebaseFirestore.getInstance();
+                Map<String, Object> ERequest = new HashMap<>();
+                ERequest.put("ContactNumber", user.getContactnumber());
+                ERequest.put("Type","Medical");
+                ERequest.put("Level","Critical");
+                ERequest.put("Latitude","21.087510");
+                ERequest.put("Longitude","71.760829");
+                LatLng cur_position = new LatLng(new Double(21.087510),new Double(71.760829));
+                Address address = findLocality(cur_position);
+                ERequest.put("lcity",address.getLocality());
+                db.collection("Emergency_Requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(getActivity(), "Request Broadcasted", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 

@@ -6,11 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fadeScrollbars="false"
+        android:scrollbarSize="7dp"
+        android:scrollbarStyle="insideOverlay"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"
+        android:foregroundGravity="center"
+        >
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/activity_horizontal_margin"
-        android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,7 +39,7 @@
                 android:text="Welcome to Helping Hands"
                 android:textColor="#C2002F"
                 android:textSize="26sp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="60dp"
                 android:layout_marginBottom="30dp"/>
         </LinearLayout>
 
@@ -119,5 +129,5 @@
 
     </LinearLayout>
 
-
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

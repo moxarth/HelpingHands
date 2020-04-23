@@ -102,7 +102,7 @@ public class MapFragment extends Fragment {
     static Circle circle;
     private static final String TAG = "MapLOG";
     static int focus = 1;
-    static int updating1234;
+    static Context mycontext;
     public MapFragment(){}
 
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
@@ -205,7 +205,7 @@ public class MapFragment extends Fragment {
                                     volunteer.marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)
                                             .title("Volunteer")
-                                            .icon(bitmapDescriptorFromVector(getActivity(), R.drawable.baseline_volunteer_location_on_24)));
+                                            .icon(bitmapDescriptorFromVector(mycontext, R.drawable.baseline_volunteer_location_on_24)));
                                     volunteer.setUserId(document.getId());
                                     volunteerList.add(volunteer);
                                     Log.d(TAG,"New Entry Added: "+document.get("firstname").toString() +" "+ latLng.toString());
@@ -375,6 +375,7 @@ public class MapFragment extends Fragment {
         recenter.setVisibility(View.INVISIBLE);
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.frg);
         final ProgressDialog progressBar1;
+        mycontext = getActivity();
         progressBar1 = new ProgressDialog(getContext());
         progressBar1.setMessage("Finding current location...");
         progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -442,6 +443,7 @@ public class MapFragment extends Fragment {
                                         googlePlex = CameraPosition.builder().target(cur_position).zoom((float) 13.5).bearing(0).build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
                                         progressBar1.dismiss();
+                                        startVolunteerThread(mMap);
                                     }
                                     @Override
                                     public void onStatusChanged(String provider, int status, Bundle extras) {}

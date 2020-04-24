@@ -205,8 +205,7 @@ public class RequestsFragment extends Fragment{
                 }
             });
         }
-        listenRequests(getContext(),myactivity);
-        /*Intent in = new Intent(getActivity(), BackgroundService.class);
+         /*Intent in = new Intent(getActivity(), BackgroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Log.v("Restarter", "Starting in foreground");
             getActivity().startForegroundService(new Intent(getActivity(), BackgroundService.class));
@@ -216,6 +215,8 @@ public class RequestsFragment extends Fragment{
         }
         Log.v("Restarter", "After starting");
         */
+
+        listenRequests(getContext(),myactivity);
         return root;
     }
 }

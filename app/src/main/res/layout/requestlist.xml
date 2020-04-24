@@ -17,7 +17,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="15dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -91,6 +93,12 @@
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
                     android:text="72.8809773" />
+                <TextView
+                    android:id="@+id/lcity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+                    android:text="72.8809773" />
             </LinearLayout>
 
             <LinearLayout
@@ -133,6 +141,21 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
                     android:text="9876543210" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:gravity="end"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/stopreq"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:text="stop request"
+                    android:textSize="12dp"
+                    android:layout_marginHorizontal="15dp"/>
+
             </LinearLayout>
 
         </LinearLayout>

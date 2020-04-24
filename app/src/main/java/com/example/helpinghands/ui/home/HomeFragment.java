@@ -62,11 +62,9 @@ import static android.content.Context.LOCATION_SERVICE;
 public class HomeFragment extends Fragment {
 
     private HomeViewModel homeViewModel;
-    private Button button;
     private ImageButton call100;
     private ImageButton call108;
     private ImageButton call101;
-
     private ImageButton test;
     private ToggleButton sosalert;
     int cntflag = 0;
@@ -409,7 +407,6 @@ public class HomeFragment extends Fragment {
         createNotificationChannel();
         db = FirebaseFirestore.getInstance();
         user = new User(getActivity());
-        button = root.findViewById(R.id.button4);
         call100 = root.findViewById(R.id.button7);
         call108 = root.findViewById(R.id.imageButton);
         call101 = root.findViewById(R.id.imageButton2);
@@ -417,27 +414,9 @@ public class HomeFragment extends Fragment {
         sosalert = root.findViewById(R.id.toggleButton);
         if(user.getSosflag() == 1){sosalert.setChecked(true);}
         fetchlocation();
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent in =new Intent(getContext(), MainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, in, 0);
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(),"001")
-                        .setSmallIcon(R.drawable.ic_helpinghands)
-                        .setContentTitle("Incoming Request")
-                        .setContentText("Someone within your area needs help")
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setContentIntent(pendingIntent)
-                        .setAutoCancel(true);
-                NotificationManagerCompat nm = NotificationManagerCompat.from(getContext());
-                nm.notify(0,builder.build());
-            }
-        });
-
         call100.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
                 if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED){
                     Log.v("status", "asking for permission");
                     requestPermissions(new String[]{Manifest.permission.CALL_PHONE},120);
@@ -561,7 +540,7 @@ public class HomeFragment extends Fragment {
                         final FirebaseFirestore db = FirebaseFirestore.getInstance();
                         Map<String, Object> ERequest = new HashMap<>();
                         ERequest.put("ContactNumber", user.getContactnumber());
-                        ERequest.put("Status", "ongoing");
+                        ERequest.put("Status", "Active");
                         ERequest.put("VolunteerID", "");
                         ERequest.put("VolunteerNo",0);
                         ERequest.put("Latitude", user.getLatitude());
@@ -569,7 +548,7 @@ public class HomeFragment extends Fragment {
                         ERequest.put("lcity", user.getlcity());
                         ERequest.put("userId", user.getUserid());
                         ERequest.put("created", FieldValue.serverTimestamp());
-                        db.collection("emergency_Requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        db.collection("emergency_requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
                                 Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();

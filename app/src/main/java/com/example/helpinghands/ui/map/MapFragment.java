@@ -117,8 +117,6 @@ class Requestor{
         this.longitude = longitude;
     }
 
-
-
     public String getRequestId() {
         return requestId;
     }
@@ -222,7 +220,7 @@ public class MapFragment extends Fragment {
         final LatLng cur_position = my_cur_position;
         final GoogleMap mMap = mMap1;
         final String userId = myuserId;
-        while(1 == 1) {
+        while(getActivity() != null) {
             if (volunteerList != null) {
                 for (Volunteer volunteer : volunteerList ) {
                     if(currflag == volunteer.flag) {
@@ -296,7 +294,7 @@ public class MapFragment extends Fragment {
         final LatLng cur_position = my_cur_position;
         final GoogleMap mMap = mMap1;
         final String userId = myuserId;
-        while(1 == 1) {
+        while(getActivity() != null) {
             if (requestorList != null) {
                 for (final Requestor requestor : requestorList ){
                     if(currflag1 == requestor.flag) {
@@ -311,7 +309,7 @@ public class MapFragment extends Fragment {
                                     @Override
                                     public void run() {
                                         if(position<volunteerList.size()){
-                                        Log.d(TAG,"Requestor was Volunteer");
+                                            Log.d(TAG,"Requestor was Volunteer");
                                             marker.setIcon(bitmapDescriptorFromVector(mycontext,R.drawable.baseline_volunteer_location_on_24));
                                             volunteerList.get(position).marker = marker;
                                         }
@@ -383,10 +381,10 @@ public class MapFragment extends Fragment {
                                         requestor.marker = volunteerList.get(position).marker;
                                     }
                                     else{
-                                    requestor.marker = mMap.addMarker(new MarkerOptions()
-                                            .position(latLng)
-                                            .title("In Emergency")
-                                            .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
+                                        requestor.marker = mMap.addMarker(new MarkerOptions()
+                                                .position(latLng)
+                                                .title("In Emergency")
+                                                .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
                                     }
                                     requestorList.add(requestor);
                                     Log.d(TAG,"Requestor Added: "+document.get("userId").toString());
@@ -418,7 +416,7 @@ public class MapFragment extends Fragment {
                     locationfetch();
                     NavController nc = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
                     PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
-                     try {
+                    try {
                         Pin.send();
                         getActivity().overridePendingTransition(0,0);
                     } catch (PendingIntent.CanceledException e) {
@@ -426,7 +424,7 @@ public class MapFragment extends Fragment {
                     }
                 } else {
                     Log.v(TAG,"Location permission rejected");
-                    }
+                }
                 return;
             }
         }
@@ -542,8 +540,9 @@ public class MapFragment extends Fragment {
         Log.v(TAG,"(VT)ThreadId1: "+currentThread().getName() + currentThread().getId());
         Thread thread = new Thread(){
             public void run(){
-                Log.v(TAG,"Starting Volunteer Thread: "+currentThread().getName() + currentThread().getId());
+                Log.d(TAG,"Starting Volunteer Thread: "+currentThread().getName() + currentThread().getId());
                 getVolunteerLocation(mymap, cur_position, user.getUserid(), address.getLocality());
+                Log.d(TAG,"Voluneer Thread Ended");
             }
         };
         thread.start();
@@ -556,6 +555,7 @@ public class MapFragment extends Fragment {
             public void run(){
                 Log.v(TAG,"Starting Requester Thread: "+currentThread().getName() + currentThread().getId());
                 getRequesterLocation(mymap, cur_position, user.getUserid(), address.getLocality());
+                Log.d(TAG,"Requestor Thread Ended");
             }
         };
         thread.start();
@@ -600,7 +600,7 @@ public class MapFragment extends Fragment {
                         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { GPS_DisableAlert(); }
                         else {
                             if(user.getLongitude() != "" && user.getLatitude() != ""){
-                            cur_position = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
+                                cur_position = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
                             }
                             else{cur_position = locationfetch();}
 
@@ -666,8 +666,8 @@ public class MapFragment extends Fragment {
                                         mark.setPosition(cur_position);
                                         circle.setCenter(cur_position);
                                         if(focus == 1){
-                                        googlePlex = CameraPosition.builder().target(cur_position).zoom((float) 13.5).bearing(0).build();
-                                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
+                                            googlePlex = CameraPosition.builder().target(cur_position).zoom((float) 13.5).bearing(0).build();
+                                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
                                         }
                                     }
                                 }

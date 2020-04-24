@@ -46,7 +46,6 @@ public class BGDatabaseListenerService extends Service {
     public static void notifyUser(Context context){
 
         Date currentTime = Calendar.getInstance().getTime();
-
         /*NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
         PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();*/
         Intent notifyIntent = new Intent(context,MainActivity.class);
@@ -73,11 +72,7 @@ public class BGDatabaseListenerService extends Service {
             nm.createNotificationChannel(channel);
             builder.setChannelId(channelId);
         }
-
-        nm.notify(0, builder.build());
-
-
-        //nm.notify(001,builder.build());
+        nm.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()), builder.build());
         Log.v("BGData", "Inside Notify");
     }
 
@@ -93,7 +88,7 @@ public class BGDatabaseListenerService extends Service {
                     switch (dc.getType()) {
                         case ADDED:
                             notifyUser(context);
-                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }

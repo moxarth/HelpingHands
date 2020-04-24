@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,44 +17,32 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Parcelable;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-
 import com.example.helpinghands.BGDatabaseListenerService;
 import com.example.helpinghands.BackgroundService;
 import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
 import com.example.helpinghands.emergencycontacts;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -573,15 +560,25 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+
         Intent in = new Intent(getActivity(), BGDatabaseListenerService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.v("Restarter1", "Starting in foreground");
+            Log.v(TAG, "Starting in foreground");
             getActivity().startForegroundService(new Intent(getActivity(), BGDatabaseListenerService.class));
         } else {
-            Log.v("Restarter1", "Starting in background");
+            Log.v(TAG, "Starting in background");
             getActivity().startService(new Intent(getActivity(), BGDatabaseListenerService.class));
         }
-        Log.v("Restarter1", "After starting");
+        Log.v(TAG, "After starting");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.v(TAG, "Starting in foreground");
+            getActivity().startForegroundService(new Intent(getActivity(), BackgroundService.class));
+        } else {
+            Log.v(TAG, "Starting in background");
+            getActivity().startService(new Intent(getActivity(), BackgroundService.class));
+        }
+        Log.v(TAG, "After starting");
 
         return root;
     }

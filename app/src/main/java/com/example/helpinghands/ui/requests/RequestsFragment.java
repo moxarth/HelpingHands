@@ -1,72 +1,30 @@
 package com.example.helpinghands.ui.requests;
-
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-
-import com.example.helpinghands.BackgroundService;
-import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
-import com.example.helpinghands.editprofile;
-import com.example.helpinghands.login;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-
-import static java.lang.Thread.currentThread;
 
 public class RequestsFragment extends Fragment{
     static User user ;
@@ -105,63 +63,6 @@ public class RequestsFragment extends Fragment{
         builder.show();
     }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Incoming Request Notification";
-            String description = "Notification for Incoming Emergency Request";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("001", name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getActivity().getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    public static void notifyUser(Context context,FragmentActivity myactivity){
-        Date currentTime = Calendar.getInstance().getTime();
-        //NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
-        //PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
-
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.putExtra("FragmentName", "MapFrag");
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"001")
-                .setSmallIcon(R.drawable.ic_helpinghands)
-                .setContentTitle("Incoming Request")
-                .setContentText("Someone within your area needs your help")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent);
-
-        builder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
-
-        NotificationManagerCompat nm = NotificationManagerCompat.from(context);
-        nm.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()),builder.build());
-    }
-
-    public static void listenRequests(final Context context,final FragmentActivity myactivity){
-        final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("emergency_requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","Active").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        case ADDED:
-                            notifyUser(context,myactivity);
-                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                            break;
-                    }
-                }
-            }
-        });
-    }
-
-
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -170,8 +71,6 @@ public class RequestsFragment extends Fragment{
                 ViewModelProviders.of(this).get(RequestsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
         final FragmentActivity myactivity = getActivity();
-        createNotificationChannel();
-
         final ListView list = root.findViewById(R.id.reqlist);
         requestId.clear();
         status.clear();
@@ -180,7 +79,6 @@ public class RequestsFragment extends Fragment{
         volunteerno.clear();
         timestamp.clear();
         city.clear();
-
         if (!checkInternetStatus()) { Internet_DisableAlert(); }
         else {
             final ProgressDialog progressBar;
@@ -213,16 +111,6 @@ public class RequestsFragment extends Fragment{
                 }
             });
         }
-        //listenRequests(getContext(),myactivity);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.v("Restarter", "Starting in foreground");
-            getActivity().startForegroundService(new Intent(getActivity(), BackgroundService.class));
-        } else {
-            Log.v("Restarter", "Starting in background");
-            getActivity().startService(new Intent(getActivity(), BackgroundService.class));
-        }
-        Log.v("Restarter", "After starting");
-
         return root;
     }
 }
@@ -255,6 +143,7 @@ class MyCustomListAdapter extends ArrayAdapter {
     }
 
     public View getView(int position, View view, ViewGroup parent) {
+
         LayoutInflater inflater=context.getLayoutInflater();
         View rowView=inflater.inflate(R.layout.requestlist, null,true);
 
@@ -298,7 +187,5 @@ class MyCustomListAdapter extends ArrayAdapter {
             });
         }
         return rowView;
-
     };
-
 }

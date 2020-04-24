@@ -206,7 +206,9 @@ public class MapFragment extends Fragment {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                marker.remove();
+                                if(marker != null) {
+                                    marker.remove();
+                                }
                             }
                         });
                     }
@@ -234,7 +236,6 @@ public class MapFragment extends Fragment {
                                                     .title("Volunteer")
                                                     .icon(bitmapDescriptorFromVector(mycontext, R.drawable.baseline_volunteer_location_on_24)));
                                         }
-
                                         marker.setPosition(new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString())));
                                         volunteer.flag = currflag;
                                     }

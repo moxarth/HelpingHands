@@ -3,6 +3,7 @@ package com.example.helpinghands.ui.requests;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -120,15 +121,23 @@ public class RequestsFragment extends Fragment{
         Date currentTime = Calendar.getInstance().getTime();
         String time = currentTime.getHours()+" : "+currentTime.getMinutes();
 
-        NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
-        PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
+        //NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
+       // PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
 
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("FragmentName", "MapFrag");
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"001")
                 .setSmallIcon(R.drawable.ic_helpinghands)
                 .setContentTitle("Incoming Request")
                 .setContentText("Someone within your area needs your help")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent);
+
+        builder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
+
         NotificationManagerCompat nm = NotificationManagerCompat.from(context);
         nm.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()),builder.build());
     }

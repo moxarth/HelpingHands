@@ -1,8 +1,11 @@
 package com.example.helpinghands;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.example.helpinghands.ui.map.MapFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
+
     @Override
     public void onBackPressed(){
         Intent a = new Intent(Intent.ACTION_MAIN);
@@ -30,6 +34,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        String FragmentName = getIntent().getStringExtra("FragmentName");
+        if (FragmentName != null) {
+            if (FragmentName.equals("MapFrag")) {
+                Log.v("position","in changing room");
+                Fragment fragment = new MapFragment();
+                FragmentManager fragmentManager = this.getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);

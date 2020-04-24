@@ -549,6 +549,7 @@ public class HomeFragment extends Fragment {
                         final FirebaseFirestore db = FirebaseFirestore.getInstance();
                         Map<String, Object> ERequest = new HashMap<>();
                         ERequest.put("ContactNumber", user.getContactnumber());
+                        ERequest.put("UserType",user.getType());
                         ERequest.put("Status", "Active");
                         ERequest.put("VolunteerID", "");
                         ERequest.put("VolunteerNo",0);

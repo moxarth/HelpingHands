@@ -119,10 +119,8 @@ public class RequestsFragment extends Fragment{
 
     public static void notifyUser(Context context,FragmentActivity myactivity){
         Date currentTime = Calendar.getInstance().getTime();
-        String time = currentTime.getHours()+" : "+currentTime.getMinutes();
-
         //NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
-           // PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
+        //PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);

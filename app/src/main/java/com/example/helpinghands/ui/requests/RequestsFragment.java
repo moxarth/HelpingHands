@@ -133,9 +133,9 @@ public class RequestsFragment extends Fragment{
         nm.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()),builder.build());
     }
 
-    public static void listenRequests(final Context context){
+    public static void listenRequests(final Context context,final FragmentActivity myactivity){
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("emergency_Requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","Active").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("emergency_requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","Active").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -144,16 +144,8 @@ public class RequestsFragment extends Fragment{
                 for (DocumentChange dc : snapshots.getDocumentChanges()) {
                     switch (dc.getType()) {
                         case ADDED:
-                            Log.d(TAG, "New city: " + dc.getDocument().getData());
+                            notifyUser(context,myactivity);
                             Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                            break;
-                        case MODIFIED:
-                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
-                            Toast.makeText(context, "Modified", Toast.LENGTH_SHORT).show();
-                            break;
-                        case REMOVED:
-                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
-                            Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }
@@ -213,7 +205,7 @@ public class RequestsFragment extends Fragment{
                 }
             });
         }
-        listenRequests(getContext());
+        listenRequests(getContext(),myactivity);
         /*Intent in = new Intent(getActivity(), BackgroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Log.v("Restarter", "Starting in foreground");

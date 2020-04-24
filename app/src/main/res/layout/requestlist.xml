@@ -14,6 +14,7 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,135 +27,127 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="Request Id :"
-                    android:textSize="20dp"
-                    android:textColor="@color/colorPrimary"/>
+                    android:layout_marginHorizontal="6dp"
+                    android:text="REQUEST ID : "
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="20dp" />
 
                 <TextView
                     android:id="@+id/requestid"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="0YRXiNCKKY5wUQRs4y8P" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:text="not set"
+                    android:textSize="17dp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="TimeStamp :" />
+                    android:text="TimeStamp :  " />
 
                 <TextView
                     android:id="@+id/timestamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="TextView" />
+                    android:text="not set" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_marginStart="50dp"
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:gravity="center"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="Location :" />
+                    android:text="Location :  " />
 
                 <TextView
                     android:id="@+id/latitude"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="22.6836121" />
+                    android:text="not set" />
 
                 <TextView
                     android:id="@+id/longitude"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="72.8809773" />
+                    android:layout_marginHorizontal="5dp"
+                    android:text="not set" />
+
                 <TextView
                     android:id="@+id/lcity"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="72.8809773" />
+                    android:layout_height="wrap_content"
+                    android:text="not set" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginStart="50dp"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="Status :" />
+                    android:text="Status :  " />
 
                 <TextView
                     android:id="@+id/status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="TextView" />
+                    android:text="not set" />
             </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/activity_horizontal_margin"
-                android:gravity="center"
-                android:orientation="horizontal">
-
+                android:orientation="horizontal"
+                android:layout_marginStart="50dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="Volunteer No :" />
+                    android:text="Volunteer No :  " />
 
                 <TextView
                     android:id="@+id/volunteerno"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-                    android:text="9876543210" />
+                    android:text="not set" />
             </LinearLayout>
 
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:gravity="end"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="end">
+
                 <Button
                     android:id="@+id/stopreq"
                     android:layout_width="wrap_content"
                     android:layout_height="38dp"
+                    android:layout_marginHorizontal="15dp"
                     android:text="stop request"
-                    android:textSize="12dp"
-                    android:layout_marginHorizontal="15dp"/>
+                    android:textSize="12dp" />
 
             </LinearLayout>
 

@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Parcelable;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +38,8 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.helpinghands.BGDatabaseListenerService;
+import com.example.helpinghands.BackgroundService;
 import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
@@ -51,6 +54,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -568,6 +572,15 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+        Intent in = new Intent(getActivity(), BGDatabaseListenerService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.v("Restarter1", "Starting in foreground");
+            getActivity().startForegroundService(new Intent(getActivity(), BGDatabaseListenerService.class));
+        } else {
+            Log.v("Restarter1", "Starting in background");
+            getActivity().startService(new Intent(getActivity(), BGDatabaseListenerService.class));
+        }
+        Log.v("Restarter1", "After starting");
 
         return root;
     }

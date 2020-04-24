@@ -3,20 +3,27 @@ package com.example.helpinghands;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.FirebaseApp;
@@ -34,36 +41,69 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class BGDatabaseListenerService extends Service {
     static int counter;
+    static User user;
     static FirebaseFirestore db;
-    public LatLng locationfetch(Context context){
-        LocationManager locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
-        final Location currentLoc;
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    public static void notifyUser(Context context){
 
-        }
-        currentLoc = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
-        Log.v(TAG,"Last known location(NETWORK): " + currentLoc);
-        if(currentLoc == null){ return  new LatLng(0,0); }
-        else{return new LatLng(currentLoc.getLatitude(),currentLoc.getLongitude());}
-    }
-
-    private void showNotification(String task) {
-        NotificationManager manager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        String channelId = "task_channel1";
-        String channelName = "task_name1";
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new
-                    NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
-            manager.createNotificationChannel(channel);
-        }
         Date currentTime = Calendar.getInstance().getTime();
-        String time = currentTime.getHours()+" : "+currentTime.getMinutes();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelId)
-                .setContentTitle(task)
-                .setContentText(time)
-                .setSmallIcon(R.drawable.ic_launcher_background);
-        manager.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()), builder.build());
+
+        /*NavController nc = Navigation.findNavController(myactivity, R.id.nav_host_fragment);
+        PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();*/
+        Intent notifyIntent = new Intent(context,MainActivity.class);
+        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent notifyPendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, 0);
+        notifyIntent.putExtra("FragmentName","MapFrag");
+        /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntent(notifyIntent);
+        PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);*/
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,"notify_001")
+                .setSmallIcon(R.drawable.ic_helpinghands)
+                .setContentTitle("Incoming Request")
+                .setContentText("Someone within your area needs your help")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(notifyPendingIntent);
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            String channelId = "notify_001";
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_HIGH);
+            nm.createNotificationChannel(channel);
+            builder.setChannelId(channelId);
+        }
+
+        nm.notify(0, builder.build());
+
+
+        //nm.notify(001,builder.build());
+        Log.v("BGData", "Inside Notify");
     }
+
+    public static void listenRequests(final Context context){
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("emergency_requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","Active").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    return;
+                }
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            notifyUser(context);
+                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+
+
+
 
 
     @Override
@@ -73,58 +113,23 @@ public class BGDatabaseListenerService extends Service {
         db = FirebaseFirestore.getInstance();
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder().setPersistenceEnabled(false).build();
         db.setFirestoreSettings(settings);
+        user = new User(getApplicationContext());
     }
 
-    public void listenRequests(User user, final Context context){
-        //final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("emergency_Requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","ongoing").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
-                }
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        case ADDED:
-                            Log.d(TAG, "New city: " + dc.getDocument().getData());
-                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                            showNotification("Added");
-                            break;
-                        case MODIFIED:
-                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
-                            Toast.makeText(context, "Modified", Toast.LENGTH_SHORT).show();
-                            break;
-                        case REMOVED:
-                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
-                            Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
-                            break;
-                    }
-                }
-            }
-        });
-    }
+
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        User user = new User(getApplicationContext());
+        notifyUser(getApplicationContext());
         //showNotification("WorkManager");
         if(counter == 0) {
 
+            listenRequests(getApplicationContext());
 
-            LatLng location = locationfetch(getApplicationContext());
 
-            user.setLatitude(Double.toString(location.latitude));
-            user.setLongitude(Double.toString(location.longitude));
-            db.collection("user_details").document(user.getUserid()).update("latitude", location.latitude, "longitude", location.longitude);
-            //showNotification("Start Location Upload" + location.toString());
+
             
             counter++;
-            /*try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Log.v("Restarter","Exception");
-            }*/
 
         }
         return Service.START_REDELIVER_INTENT;
@@ -132,12 +137,12 @@ public class BGDatabaseListenerService extends Service {
 
     @Override
     public void onDestroy(){
-        Log.v("BackgroundService","Destroyed");
+        Log.v("BGListenerService","Destroyed");
         counter--;
         super.onDestroy();
         Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("restartservice");
-        broadcastIntent.setClass(this, Restarter.class);
+        broadcastIntent.setAction("restartservice1");
+        broadcastIntent.setClass(this, Restarter1.class);
         this.sendBroadcast(broadcastIntent);
 
     }

@@ -61,7 +61,9 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"
+            android:taskAffinity=""/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

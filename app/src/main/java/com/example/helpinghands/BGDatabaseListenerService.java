@@ -115,7 +115,7 @@ public class BGDatabaseListenerService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        notifyUser(getApplicationContext());
+        //notifyUser(getApplicationContext());
         //showNotification("WorkManager");
         if(counter == 0) {
 

@@ -58,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
-        final WorkManager mWorkManager = WorkManager.getInstance();
-        final PeriodicWorkRequest mRequest = new PeriodicWorkRequest.Builder(BackgroundWorker.class,5, TimeUnit.MINUTES).build();
-        mWorkManager.getInstance(getApplicationContext()).enqueue(mRequest);
+
     }
 }

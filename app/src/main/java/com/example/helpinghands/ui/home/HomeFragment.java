@@ -62,17 +62,7 @@ public class HomeFragment extends Fragment {
     static  LatLng cur_position;
     LocationManager locationManager;
     private static final String TAG = "HomeLOG";
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            String description = getString(R.string.app_name);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("002", name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getActivity().getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
+
     static FirebaseFirestore db;
     static Address address;
     static User user;
@@ -392,7 +382,6 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final LayoutInflater myinflater = inflater;
         final ViewGroup mycontainer = container;
-        createNotificationChannel();
         db = FirebaseFirestore.getInstance();
         user = new User(getActivity());
         call100 = root.findViewById(R.id.button7);

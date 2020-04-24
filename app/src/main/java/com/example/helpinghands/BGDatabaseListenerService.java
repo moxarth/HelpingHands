@@ -26,6 +26,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -43,6 +44,27 @@ public class BGDatabaseListenerService extends Service {
     static int counter;
     static User user;
     static FirebaseFirestore db;
+
+    static double toRadians(double angleIn10thofaDegree) {
+        return (angleIn10thofaDegree * Math.PI) / 180;
+    }
+
+    static double distance(LatLng point1, LatLng point2){
+        double lon1 = toRadians(point1.longitude);
+        double lon2 = toRadians(point2.longitude);
+        double lat1 = toRadians(point1.latitude);
+        double lat2 = toRadians(point2.latitude);
+        double dlon = lon2 - lon1;
+        double dlat = lat2 - lat1;
+        double a = Math.pow(Math.sin(dlat / 2), 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                        Math.pow(Math.sin(dlon / 2),2);
+
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double r = 6371;
+        return (c * r);
+    }
+
     public static void notifyUser(Context context){
 
         Date currentTime = Calendar.getInstance().getTime();
@@ -67,7 +89,7 @@ public class BGDatabaseListenerService extends Service {
             String channelId = "notify_001";
             NotificationChannel channel = new NotificationChannel(
                     channelId,
-                    "Channel human readable title",
+                    "Incoming Request Notification",
                     NotificationManager.IMPORTANCE_HIGH);
             nm.createNotificationChannel(channel);
             builder.setChannelId(channelId);
@@ -87,7 +109,11 @@ public class BGDatabaseListenerService extends Service {
                 for (DocumentChange dc : snapshots.getDocumentChanges()) {
                     switch (dc.getType()) {
                         case ADDED:
-                            notifyUser(context);
+                            LatLng cur_position = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
+                            LatLng latLng = new LatLng(Double.parseDouble(dc.getDocument().get("Latitude").toString()),Double.parseDouble(dc.getDocument().get("Longitude").toString()));
+                            if (distance(latLng, cur_position) < 2.5) {
+                                notifyUser(context);
+                            }
                             //Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
                             break;
                     }

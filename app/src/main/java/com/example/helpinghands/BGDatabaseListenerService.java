@@ -14,14 +14,11 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.helpinghands.R;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -34,9 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
-import static java.lang.Thread.sleep;
 
-public class BackgroundService extends Service {
+public class BGDatabaseListenerService extends Service {
     static int counter;
     static FirebaseFirestore db;
     public LatLng locationfetch(Context context){
@@ -121,7 +117,7 @@ public class BackgroundService extends Service {
             user.setLongitude(Double.toString(location.longitude));
             db.collection("user_details").document(user.getUserid()).update("latitude", location.latitude, "longitude", location.longitude);
             //showNotification("Start Location Upload" + location.toString());
-
+            
             counter++;
             /*try {
                 sleep(5000);

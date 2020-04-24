@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -17,6 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class BackgroundService extends Service {
+    static int counter;
 
     private void showNotification(String task) {
         NotificationManager manager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -38,24 +40,41 @@ public class BackgroundService extends Service {
 
     @Override
     public void onCreate() {
+        counter = 0;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //showNotification("WorkManager");
-        Thread t = new Thread(){
-            public void run(){
-                while(true){
-                    showNotification("Helllo");
-                    try {
-                        sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        if(counter == 0) {
+            Thread t = new Thread() {
+                public void run() {
+                    while (true) {
+                        showNotification("Helllo");
+                        try {
+                            sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }};
-        t.start();
-        return Service.START_NOT_STICKY;
+            };
+            t.start();
+            counter++;
+        }
+        return Service.START_STICKY;
+    }
+
+    @Override
+    public void onDestroy(){
+        Log.v("BackgroundService","Destroyed");
+        counter--;
+        super.onDestroy();
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("restartservice");
+        broadcastIntent.setClass(this, Restarter.class);
+        this.sendBroadcast(broadcastIntent);
+
     }
 
     @Nullable

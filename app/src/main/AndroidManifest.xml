@@ -15,6 +15,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <receiver
+            android:name="Restarter"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="restartservice" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".emergencycontacts"
             android:label="Emergency Contacts"
@@ -51,7 +61,7 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <service android:name=".BackgroundService" android:enabled="true"></service>
+        <service android:name=".BackgroundService" android:enabled="true" android:process=":new_process"></service>
     </application>
 
 </manifest>

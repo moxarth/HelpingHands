@@ -141,9 +141,16 @@ public class RequestsFragment extends Fragment{
         list.setAdapter(adapter);
         //notifyUser(getContext(),myactivity);
 
-        //Intent in = new Intent(getActivity(), BackgroundService.class);
-        //getActivity().startService(in);
-       // listenRequests(getContext());
+        Intent in = new Intent(getActivity(), BackgroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.v("Restarter", "Starting in foreground");
+            getActivity().startForegroundService(new Intent(getActivity(), BackgroundService.class));
+        } else {
+            Log.v("Restarter", "Starting in background");
+            getActivity().startService(new Intent(getActivity(), BackgroundService.class));
+        }
+        Log.v("Restarter", "After starting");
+        listenRequests(getContext());
 
         return root;
     }

@@ -333,15 +333,13 @@ public class HomeFragment extends Fragment {
 
         Log.v(TAG,"Initializing fetch location thread");
 
-        if (!checkInternetStatus()) { Internet_DisableAlert(); }
-        else{
+        if(checkInternetStatus()){
             locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
             }
             else{
-                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { GPS_DisableAlert(); }
-                else{
+                if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
                     cur_position = locationfetch();
                     if(cur_position.latitude == 0){
 
@@ -396,7 +394,6 @@ public class HomeFragment extends Fragment {
         }
     }
 
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
@@ -413,7 +410,15 @@ public class HomeFragment extends Fragment {
         test = root.findViewById(R.id.button8);
         sosalert = root.findViewById(R.id.toggleButton);
         if(user.getSosflag() == 1){sosalert.setChecked(true);}
-        fetchlocation();
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                fetchlocation();
+                Log.v(TAG,"Starting Location Thread");
+            }
+        });
+
         call100.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

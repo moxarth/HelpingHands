@@ -135,7 +135,7 @@ public class RequestsFragment extends Fragment{
 
     public static void listenRequests(final Context context){
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("emergency_Requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","ongoing").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("emergency_Requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","Active").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -164,12 +164,14 @@ public class RequestsFragment extends Fragment{
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         user = new User(getActivity());
         requestsViewModel =
                 ViewModelProviders.of(this).get(RequestsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_requests, container, false);
         final FragmentActivity myactivity = getActivity();
         createNotificationChannel();
+
         final ListView list = root.findViewById(R.id.reqlist);
         requestId.clear();
         status.clear();
@@ -178,6 +180,7 @@ public class RequestsFragment extends Fragment{
         volunteerno.clear();
         timestamp.clear();
         city.clear();
+
         if (!checkInternetStatus()) { Internet_DisableAlert(); }
         else {
             final ProgressDialog progressBar;
@@ -210,8 +213,8 @@ public class RequestsFragment extends Fragment{
                 }
             });
         }
-
-        Intent in = new Intent(getActivity(), BackgroundService.class);
+        listenRequests(getContext());
+        /*Intent in = new Intent(getActivity(), BackgroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Log.v("Restarter", "Starting in foreground");
             getActivity().startForegroundService(new Intent(getActivity(), BackgroundService.class));
@@ -220,7 +223,7 @@ public class RequestsFragment extends Fragment{
             getActivity().startService(new Intent(getActivity(), BackgroundService.class));
         }
         Log.v("Restarter", "After starting");
-        //listenRequests(getContext());
+        */
         return root;
     }
 }

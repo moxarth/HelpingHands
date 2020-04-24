@@ -405,11 +405,11 @@ public class MapFragment extends Fragment {
                     else {
                         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { GPS_DisableAlert(); }
                         else {
+                            if(user.getLongitude() != "" && user.getLatitude() != ""){
+                            cur_position = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
+                            }
+                            else{cur_position = locationfetch();}
 
-                            //cur_position = new LatLng(0,0);  /*for testing purpose only*/
-                            cur_position = locationfetch();
-
-                            /*set map attributes -------------------------------- */
                             mMap.setMapType(MAP_TYPE_NORMAL);
                             mMap.clear();
                             googlePlex = CameraPosition.builder().target(cur_position).zoom((float) 13.5).bearing(0).build();
@@ -425,9 +425,6 @@ public class MapFragment extends Fragment {
                                 }
                             });
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 10, null);
-                            /*end ------------------------------------------------- */
-
-                            /*if last known location is null -----------------------*/
                             if(cur_position.latitude == 0){
                                 progressBar1.show();
                                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
@@ -454,32 +451,25 @@ public class MapFragment extends Fragment {
                                     public void onProviderDisabled(String provider) {}
                                 });
                             }
-                            /*else --------------------------------------------------*/
                             else{
                                 setUserLocation(user, cur_position);
                                 address = findLocality(cur_position);
                                 updateLocality(user, address);
                                 startVolunteerThread(mMap);
                             }
-                            /*End of if-else-----------------------------------------*/
-
-                            /*requesting location updates --------------------------*/
                             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
                                 @Override
                                 public void onLocationChanged(Location location) {
                                     progressBar1.dismiss();
                                     if (cur_position.latitude == location.getLatitude() && cur_position.longitude == location.getLongitude()) {
                                         Log.v(TAG, "Location updated (SAME VALUE)");
-                                        //Log.v(TAG, "Thread 3: " + currentThread().getName() + currentThread().getId());
                                     } else {
                                         cur_position = new LatLng(location.getLatitude(), location.getLongitude());
                                         setUserLocation(user, cur_position);
                                         Log.v(TAG, "Location updated: " + location.getLatitude() + ", " + location.getLongitude());
-                                        //Log.v(TAG, "ThreadId4: " + currentThread().getName() + currentThread().getId());
                                         mark.setPosition(cur_position);
                                         circle.setCenter(cur_position);
                                         if(focus == 1){
-                                        /*aani jarur che ene rakhje anu kaik solution laishu pachi(for next two line)*/
                                         googlePlex = CameraPosition.builder().target(cur_position).zoom((float) 13.5).bearing(0).build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(googlePlex), 1000, null);
                                         }
@@ -492,8 +482,6 @@ public class MapFragment extends Fragment {
                                 @Override
                                 public void onProviderDisabled(String provider) {}
                             });
-                            /*End ---------------------------------------------------*/
-
                             recenter.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {

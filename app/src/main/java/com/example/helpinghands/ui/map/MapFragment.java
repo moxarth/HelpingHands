@@ -228,6 +228,13 @@ public class MapFragment extends Fragment {
                                     if (distance(latLng, cur_position) < 2.5) {
                                         Log.v(TAG, "Existing Entry: "+document.get("firstname").toString());
                                         Marker marker = volunteer.getMarker();
+                                        if(marker == null){
+                                            volunteer.marker = mMap.addMarker(new MarkerOptions()
+                                                    .position(latLng)
+                                                    .title("Volunteer")
+                                                    .icon(bitmapDescriptorFromVector(mycontext, R.drawable.baseline_volunteer_location_on_24)));
+                                        }
+
                                         marker.setPosition(new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString())));
                                         volunteer.flag = currflag;
                                     }
@@ -238,8 +245,6 @@ public class MapFragment extends Fragment {
                                 LatLng latLng = new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString()));
                                 Log.d(TAG,"Checking for New: "+document.get("firstname").toString() +" "+ latLng.toString());
                                 if (distance(latLng, cur_position) < 2.5) {
-                                    //mark map
-
                                     Volunteer volunteer = new Volunteer();
                                     volunteer.flag = currflag;
                                     volunteer.marker = mMap.addMarker(new MarkerOptions()

@@ -1,7 +1,5 @@
 package com.example.helpinghands;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +10,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -36,20 +36,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         String FragmentName = getIntent().getStringExtra("FragmentName");
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (FragmentName != null) {
-
             if (FragmentName.equals("MapFrag")) {
                 Log.v("position","in changing room");
-                NavController nc = Navigation.findNavController(this, R.id.nav_host_fragment);
-                PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
-                try {
-                    Pin.send();
-                    this.overridePendingTransition(0,0);
-                } catch (PendingIntent.CanceledException e) {
-                    e.printStackTrace();
-                }
+                Fragment fragment = new MapFragment();
+                FragmentManager fragmentManager = this.getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         }
         super.onCreate(savedInstanceState);

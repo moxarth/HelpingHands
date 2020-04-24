@@ -85,7 +85,7 @@ public class BackgroundService extends Service {
 
 
             db.collection("user_details").document(user.getUserid()).update("latitude", location.latitude, "longitude", location.longitude);
-            showNotification("Start Location Upload" + location.toString());
+            //showNotification("Start Location Upload" + location.toString());
             counter++;
             /*try {
                 sleep(5000);

@@ -579,6 +579,7 @@ public class HomeFragment extends Fragment {
                                                     }
                                                 }
                                             };
+                                            t.start();
                                         }
                                     });
                                 }

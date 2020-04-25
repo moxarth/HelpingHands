@@ -30,6 +30,8 @@ import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -40,6 +42,7 @@ import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.User;
 import com.example.helpinghands.emergencycontacts;
+import com.example.helpinghands.ui.map.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -587,7 +590,18 @@ public class HomeFragment extends Fragment {
             getActivity().startService(new Intent(getActivity(), BackgroundService.class));
         }
         Log.v(TAG, "After starting");
-
+        /*String FragmentName = getActivity().getIntent().getStringExtra("FragmentName");
+        Log.v(TAG, "String: " + FragmentName);
+        if(FragmentName != null) {
+            if (FragmentName.equals("MapFrag")) {
+                Fragment fragment = new MapFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        }*/
         return root;
     }
 }

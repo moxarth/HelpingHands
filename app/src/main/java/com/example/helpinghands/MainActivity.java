@@ -33,30 +33,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        String FragmentName = getIntent().getStringExtra("FragmentName");
-        if (FragmentName != null) {
-            if (FragmentName.equals("MapFrag")) {
-                Log.v("position","in changing room");
-                /*Fragment fragment = new MapFragment();
-                FragmentManager fragmentManager = this.getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();*/
-                NavController nc = Navigation.findNavController(this, R.id.nav_host_fragment);
-                PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
-                try {
-                    Pin.send();
-                    this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                } catch (PendingIntent.CanceledException e) {
-                    e.printStackTrace();
-                }
-
+    public void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+        Log.v("position","NewMethod Here");
+        Bundle extras = intent.getExtras();
+        if(extras != null){
+            if(extras.containsKey("FragmentName")){
+                String str = extras.getString("FragmentName");
+                Log.v("position","NewMethod" + str);
             }
         }
+
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
+        //onNewIntent(getIntent());
         setContentView(R.layout.activity_main);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -67,6 +63,30 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
+        String FragmentName = getIntent().getStringExtra("FragmentName");
+        Log.v("position","First" + FragmentName);
+        if (FragmentName != null) {
+            Log.v("position","Inside");
+            if (FragmentName.equals("MapFrag")) {
+                Log.v("position","in changing room");
+                /*Fragment fragment = new MapFragment();
+                FragmentManager fragmentManager = this.getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack("Name");
+                fragmentTransaction.commit();*/
+                /*NavController nc = Navigation.findNavController(this, R.id.nav_host_fragment);
+                PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
+                try {
+                    Pin.send();
+                    this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } catch (PendingIntent.CanceledException e) {
+                    e.printStackTrace();
+                }*/
+
+            }
+        }
 
     }
 }

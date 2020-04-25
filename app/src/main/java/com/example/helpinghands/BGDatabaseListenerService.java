@@ -85,8 +85,10 @@ public class BGDatabaseListenerService extends Service {
         PendingIntent pendingIntent = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();*/
         Intent notifyIntent = new Intent(context,MainActivity.class);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent notifyPendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, 0);
+        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         notifyIntent.putExtra("FragmentName","MapFrag");
+        PendingIntent notifyPendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         /*TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addNextIntent(notifyIntent);
         PendingIntent notifyPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);*/

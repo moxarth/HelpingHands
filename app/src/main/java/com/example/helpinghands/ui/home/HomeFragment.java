@@ -37,11 +37,15 @@ import com.example.helpinghands.R;
 import com.example.helpinghands.User;
 import com.example.helpinghands.emergencycontacts;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -522,24 +526,35 @@ public class HomeFragment extends Fragment {
                     if (!checkInternetStatus()) { Internet_DisableAlert(); }
                     else {
                         final User user = new User(getActivity());
-                        final FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        Map<String, Object> ERequest = new HashMap<>();
-                        ERequest.put("ContactNumber", user.getContactnumber());
-                        ERequest.put("UserType",user.getType());
-                        ERequest.put("Status", "Active");
-                        ERequest.put("VolunteerID", "");
-                        ERequest.put("VolunteerNo",0);
-                        ERequest.put("Latitude", user.getLatitude());
-                        ERequest.put("Longitude", user.getLongitude());
-                        ERequest.put("lcity", user.getlcity());
-                        ERequest.put("userId", user.getUserid());
-                        ERequest.put("created", FieldValue.serverTimestamp());
-                        db.collection("emergency_requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        db.collection("emergency_requests").whereEqualTo("userId",user.getUserid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Toast.makeText(getContext(), "Emergency Request Broadcasted", Toast.LENGTH_LONG).show();
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if(task.getResult().size() > 0){
+                                    Toast.makeText(getActivity(), "Cannot Broadcast Emergency Signal", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    final FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                    Map<String, Object> ERequest = new HashMap<>();
+                                    ERequest.put("ContactNumber", user.getContactnumber());
+                                    ERequest.put("UserType", user.getType());
+                                    ERequest.put("Status", "Active");
+                                    ERequest.put("VolunteerID", "");
+                                    ERequest.put("VolunteerNo", 0);
+                                    ERequest.put("Latitude", user.getLatitude());
+                                    ERequest.put("Longitude", user.getLongitude());
+                                    ERequest.put("lcity", user.getlcity());
+                                    ERequest.put("userId", user.getUserid());
+                                    ERequest.put("created", FieldValue.serverTimestamp());
+                                    db.collection("emergency_requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
                             }
                         });
+
                     }
                 }
                 else{

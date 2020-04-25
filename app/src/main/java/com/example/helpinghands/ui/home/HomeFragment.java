@@ -534,18 +534,7 @@ public class HomeFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if(task.getResult().size() > 0){
-                                    Toast.makeText(getActivity(), "Cannot Broadcast Emergency Signal", Toast.LENGTH_SHORT).show();
-                                    NavController nc = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
-                                    PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_requests).createPendingIntent();
-                                    try {
-                                        Pin.send();
-                                        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                                    } catch (PendingIntent.CanceledException e) {
-                                        e.printStackTrace();
-                                    }
-
-
-
+                                    Toast.makeText(getActivity(), "Emergency signal is started already", Toast.LENGTH_SHORT).show();
                                 }
                                 else {
                                     final FirebaseFirestore db = FirebaseFirestore.getInstance();

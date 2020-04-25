@@ -201,20 +201,12 @@ public class ProfileFragment extends Fragment {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
                                                 Log.v("status","Success user_details");
+                                                user.removeUser();
                                                 Toast.makeText(getActivity(),"Account deactivated successfully",Toast.LENGTH_SHORT).show();
-                                                db.collection("emergency_details").document(user.getUserid()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if(task.isSuccessful()){
-                                                            Log.v("status","Removed"+user.getUserid());
-                                                            user.removeUser();
-                                                            progressBar.dismiss();
-                                                            Intent in = new Intent(getContext(), login.class);
-                                                            startActivity(in);
-                                                        }
-                                                        else{Log.v("status","Failed user_details");}
-                                                    }
-                                                });
+                                                progressBar.dismiss();
+                                                Intent in = new Intent(getContext(), login.class);
+                                                startActivity(in);
+                                                //((Activity)getContext()).overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
                                             }
                                             else{
                                                 Toast.makeText(getActivity(),"Error while performing action",Toast.LENGTH_SHORT).show();

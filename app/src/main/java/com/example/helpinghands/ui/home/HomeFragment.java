@@ -77,7 +77,7 @@ public class HomeFragment extends Fragment {
     static FirebaseFirestore db;
     static Address address;
     static User user;
-
+    public static String vid ="initial";
     public LatLng locationfetch(){
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         final Location currentLoc;

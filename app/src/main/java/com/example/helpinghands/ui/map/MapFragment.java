@@ -46,6 +46,7 @@ import com.example.helpinghands.MainActivity;
 import com.example.helpinghands.R;
 import com.example.helpinghands.Splash;
 import com.example.helpinghands.User;
+import com.example.helpinghands.ui.home.HomeFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -275,12 +276,20 @@ public class MapFragment extends Fragment {
                                 if (distance(latLng, cur_position) < 2.5) {
                                     Volunteer volunteer = new Volunteer();
                                     volunteer.flag = currflag;
-                                    volunteer.marker = mMap.addMarker(new MarkerOptions()
+                                    volunteer.setUserId(document.getId());
+                                    volunteer.setUsertype("volunteer");
+                                    if(HomeFragment.vid.equals(document.getId()) ){
+                                        volunteer.marker = mMap.addMarker(new MarkerOptions()
+                                                .position(latLng)
+                                                .title("Assigned Volunteer")
+                                                .icon(bitmapDescriptorFromVector(mycontext, R.drawable.assigned_volunteer)));
+                                    }
+                                    else{
+                                        volunteer.marker = mMap.addMarker(new MarkerOptions()
                                             .position(latLng)
                                             .title("Volunteer")
                                             .icon(bitmapDescriptorFromVector(mycontext, R.drawable.baseline_volunteer_location_on_24)));
-                                    volunteer.setUserId(document.getId());
-                                    volunteer.setUsertype("volunteer");
+                                    }
                                     volunteerList.add(volunteer);
                                     Log.d(TAG,"Volunteer Added: "+document.getId());
                                     Log.d(TAG,"Volunteer List"+volunteerList.toString());
@@ -647,7 +656,7 @@ public class MapFragment extends Fragment {
 
                                 @Override
                                 public View getInfoContents(Marker marker) {
-                                    if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here"))
+                                    if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here") && !marker.getTitle().equals("Assigned Volunteer"))
                                     {
                                         return prepareInfoView(marker,getActivity());
                                     }

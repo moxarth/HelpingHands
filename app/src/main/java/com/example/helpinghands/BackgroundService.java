@@ -57,6 +57,7 @@ public class BackgroundService extends Service {
     public int onStartCommand(final Intent intent, int flags, int startId) {
         User user = new User(getApplicationContext());
         if(counter == 0) {
+            
             LocationManager locationManager1 = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
             if (user.getFName() != "" && locationManager1.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && checkInternetStatus() && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 LatLng location = locationfetch(getApplicationContext());

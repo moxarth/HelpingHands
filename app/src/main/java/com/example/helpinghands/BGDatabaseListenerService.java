@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -27,23 +28,35 @@ import androidx.navigation.Navigation;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
+
+
+
+
 
 public class BGDatabaseListenerService extends Service {
     static int counter;
     static User user;
+    static Requestor requestor;
     static FirebaseFirestore db;
+
+
 
     static double toRadians(double angleIn10thofaDegree) {
         return (angleIn10thofaDegree * Math.PI) / 180;
@@ -94,30 +107,76 @@ public class BGDatabaseListenerService extends Service {
             nm.createNotificationChannel(channel);
             builder.setChannelId(channelId);
         }
+
         nm.notify(Integer.parseInt(currentTime.getMinutes()+""+currentTime.getSeconds()), builder.build());
         Log.v("BGData", "Inside Notify");
     }
 
     public static void listenRequests(final Context context){
+        Log.v("BGData","Log");
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("emergency_requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","Active").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("emergency_requests").whereEqualTo("lcity",user.getlcity()).whereEqualTo("Status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot snapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.v("BGData","Log1");
                     return;
                 }
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        case ADDED:
-                            LatLng cur_position = new LatLng(Double.parseDouble(user.getLatitude()),Double.parseDouble(user.getLongitude()));
-                            LatLng latLng = new LatLng(Double.parseDouble(dc.getDocument().get("Latitude").toString()),Double.parseDouble(dc.getDocument().get("Longitude").toString()));
-                            if (distance(latLng, cur_position) < 2.5) {
-                                notifyUser(context);
+                Log.v("BGData","Log1 Success");
+                List<Requestor> temp = user.getRequestorList();
+                List<Requestor> toRemove = new ArrayList<Requestor>();
+                if (temp != null) {
+                    for (Requestor requestor : temp ) {
+                        Log.v("BGData","Checking to remove: " + requestor.getRequestId() + "CurrFlag: " + user.getCurrflag() + " Requestor Flag:" + requestor.flag);
+                        if(user.getCurrflag() == requestor.flag || ( distance( new LatLng(Double.parseDouble(requestor.getLatitude()), Double.parseDouble(requestor.getLongitude()))  , new LatLng(Double.parseDouble(user.getLatitude()), Double.parseDouble(user.getLongitude()))  ) > 2.5 ) ) {
+                            Log.v("BGData","Removed "+ requestor.getRequestId());
+                            toRemove.add(requestor);
+                        }
+                    }
+                    for(Requestor requestor : toRemove){
+                        temp.remove(requestor);
+                    }
+                    user.setRequestorList(temp);
+                }
+                for (QueryDocumentSnapshot dc : task.getResult()) {
+
+
+                            int i;
+                            String reqId = dc.getId();
+                            List<Requestor> reqList = user.getRequestorList();
+                            Log.v("BGData","Size when checking:" + reqList.size());
+                            for(i = 0; i < reqList.size(); i++){
+                                Requestor requestor = reqList.get(i);
+                                if(requestor.getRequestId().equals(reqId)){
+                                    Log.v("BGData","Checked In on: " + requestor.getRequestId());
+                                    requestor.flag = user.getCurrflag();
+                                    break;
+                                }
+                            }
+                            user.setRequestorList(reqList);
+                            if(i == user.getRequestorList().size()){
+                                LatLng latLng = new LatLng(Double.parseDouble(dc.get("Latitude").toString()), Double.parseDouble(dc.get("Longitude").toString()));
+                                if(distance(latLng, new LatLng(Double.parseDouble(user.getLatitude()), Double.parseDouble(user.getLongitude()))) < 2.5){
+                                    Requestor requestor = new Requestor();
+                                    requestor.setRequestId(dc.getId());
+                                    requestor.setUserId(dc.get("userId").toString());
+                                    requestor.setLatitude(dc.get("Latitude").toString());
+                                    requestor.setLongitude(dc.get("Longitude").toString());
+                                    requestor.flag = user.getCurrflag();
+                                    user.addToRequestorList(requestor);
+                                    Log.v("BGData","Size after adding:" + user.getRequestorList().size());
+                                    Log.v("BGData","Added" + user.getRequestorList().toString());
+                                    if(!requestor.getUserId().equals(user.getUserid()))
+                                        notifyUser(context);
+                                }
                             }
                             //Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                            break;
-                    }
+
+
+
+
                 }
+                user.setCurrflag(!user.getCurrflag());
             }
         });
     }

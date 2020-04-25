@@ -3,6 +3,15 @@ package com.example.helpinghands;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+
+
 public class User {
     Context context;
     SharedPreferences sharedPreferences;
@@ -32,6 +41,73 @@ public class User {
     private String longitude;
     private int sosflag;
     private String lcity;
+    private String requestorList;
+    private boolean currflag;
+
+    public boolean getCurrflag() {
+        currflag = sharedPreferences.getBoolean("currflag",true);
+        return currflag;
+    }
+
+    public void setCurrflag(boolean currflag) {
+        this.currflag = currflag;
+        sharedPreferences.edit().putBoolean("currflag",currflag).commit();
+    }
+
+    public void addToRequestorList(Requestor requestor){
+        requestorList = sharedPreferences.getString("requestorList","");
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Requestor>>(){}.getType();
+        List<Requestor> reqList = gson.fromJson(requestorList, type);
+        if(reqList == null){
+            reqList = new ArrayList<Requestor>();
+            reqList.add(requestor);
+        }
+        else {
+            reqList.add(requestor);
+        }
+        String json = gson.toJson(reqList);
+        this.requestorList = json;
+        sharedPreferences.edit().putString("requestorList",json).commit();
+    }
+
+    public void removeFromRequestorList(Requestor requestor){
+        requestorList = sharedPreferences.getString("requestorList","");
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Requestor>>(){}.getType();
+        List<Requestor> reqList = gson.fromJson(requestorList, type);
+        reqList.remove(requestor);
+        if(reqList == null){
+            reqList = new ArrayList<Requestor>();
+        }
+        String json = gson.toJson(reqList);
+        this.requestorList = json;
+        sharedPreferences.edit().putString("requestorList",json).commit();
+    }
+
+    public List<Requestor> getRequestorList() {
+        requestorList = sharedPreferences.getString("requestorList","");
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Requestor>>(){}.getType();
+        List<Requestor> reqList = gson.fromJson(requestorList, type);
+        if(reqList == null){
+            return new ArrayList<Requestor>();
+        }
+        else {
+            return reqList;
+        }
+    }
+
+    public void setRequestorList(List<Requestor> requestorList) {
+        if(requestorList == null){
+            requestorList = new ArrayList<Requestor>();
+
+        }
+        Gson gson = new Gson();
+        String json = gson.toJson(requestorList);
+        this.requestorList = json;
+        sharedPreferences.edit().putString("requestorList",json).commit();
+    }
 
     public String getlcity() {
         lcity = sharedPreferences.getString("lcity","");

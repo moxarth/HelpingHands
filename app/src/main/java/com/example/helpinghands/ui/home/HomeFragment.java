@@ -78,6 +78,7 @@ public class HomeFragment extends Fragment {
     static Address address;
     static User user;
     public static String vid ="initial";
+
     public LatLng locationfetch(){
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         final Location currentLoc;
@@ -125,24 +126,6 @@ public class HomeFragment extends Fragment {
         myuser.setlcity(myaddress.getLocality());
         Log.v(TAG,"Setting Locality: "+myaddress.getLocality());
         db.collection("user_details").document(myuser.getUserid()).update("lcity",myaddress.getLocality());
-    }
-
-    public void GPS_DisableAlert(){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setMessage("It seems GPS is disabled. You need to enable GPS location to access map")
-                .setCancelable(false)
-                .setPositiveButton("Turn on", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
     }
 
     public boolean checkInternetStatus(){

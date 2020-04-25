@@ -181,6 +181,17 @@ public class BGDatabaseListenerService extends Service {
         });
     }
 
+    public boolean checkInternetStatus(){
+        boolean status = false;
+        try {
+            final String command = "ping -c 1 google.com";
+            status = (Runtime.getRuntime().exec(command).waitFor() == 0);
+            Log.v(TAG, "Network Status: " + status);
+        } catch (Exception e) {
+            Log.e(TAG,"Network Error: "+e.toString());
+        }
+        return status;
+    }
 
 
 
@@ -203,9 +214,11 @@ public class BGDatabaseListenerService extends Service {
         //notifyUser(getApplicationContext());
         //showNotification("WorkManager");
         if(counter == 0) {
-
-            listenRequests(getApplicationContext());
-
+            LocationManager locationManager1 = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+            if (user.getFName() != "" && locationManager1.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && checkInternetStatus() && ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            {
+                listenRequests(getApplicationContext());
+            }
 
 
             

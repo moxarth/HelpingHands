@@ -537,7 +537,7 @@ public class HomeFragment extends Fragment {
                         db.collection("emergency_requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
-                                Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Emergency Request Broadcasted", Toast.LENGTH_LONG).show();
                             }
                         });
                     }

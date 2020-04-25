@@ -248,13 +248,18 @@ public class MapFragment extends Fragment {
                             int i;
                             for(i = 0; i < volunteerList.size(); i++){
                                 Volunteer volunteer = volunteerList.get(i);
+                                //Log.d(TAG,volunteer.getUserId()+" vs "+document.getId());
                                 if(volunteer.getUserId().equals(document.getId())){
                                     LatLng latLng = new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString()));
-                                    //Log.d(TAG, "Existing volunteer: "+document.get("firstname").toString());
                                     if (distance(latLng, cur_position) < 2.5) {
-                                        Log.d(TAG, "Existing volunteer updated: "+document.get("firstname").toString());
-                                        Marker marker = volunteer.getMarker();
-                                        marker.setPosition(new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString())));
+                                        if(volunteer.getUsertype().equals("requestor")){
+                                            Log.d(TAG,"Skip Volunteer: "+volunteer.getUserId());
+                                        }
+                                        else{
+                                            Log.d(TAG, "Volunteer updated: "+document.getId());
+                                            Marker marker = volunteer.getMarker();
+                                            marker.setPosition(new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString())));
+                                        }
                                         volunteer.flag = currflag;
                                     }
                                     break;
@@ -262,7 +267,6 @@ public class MapFragment extends Fragment {
                             }
                             if(i == volunteerList.size()){
                                 LatLng latLng = new LatLng(Double.parseDouble(document.get("latitude").toString()), Double.parseDouble(document.get("longitude").toString()));
-                                //Log.d(TAG,"Cheking: "+document.get("firstname").toString());
                                 if (distance(latLng, cur_position) < 2.5) {
                                     Volunteer volunteer = new Volunteer();
                                     volunteer.flag = currflag;
@@ -271,8 +275,10 @@ public class MapFragment extends Fragment {
                                             .title("Volunteer")
                                             .icon(bitmapDescriptorFromVector(mycontext, R.drawable.baseline_volunteer_location_on_24)));
                                     volunteer.setUserId(document.getId());
+                                    volunteer.setUsertype("volunteer");
                                     volunteerList.add(volunteer);
-                                    Log.d(TAG,"Volunteer Added: "+document.get("firstname").toString());
+                                    Log.d(TAG,"Volunteer Added: "+document.getId());
+                                    Log.d(TAG,"Volunteer List"+volunteerList.toString());
                                 }
                             }
                         }
@@ -299,8 +305,6 @@ public class MapFragment extends Fragment {
                 for (final Requestor requestor : requestorList ){
                     if(currflag1 == requestor.flag) {
                         requestorList.remove(requestor);
-                        marker = requestor.marker;
-                        Log.d(TAG,"Requestor Removed: "+ requestor.userId);
                         final int position = findVolunteer(requestor.getUserId());
                         final LatLng latlng = new LatLng(Double.parseDouble(requestor.getLatitude()),Double.parseDouble(requestor.getLongitude()));
                         if(position != -1){
@@ -309,19 +313,26 @@ public class MapFragment extends Fragment {
                                     @Override
                                     public void run() {
                                         if(position<volunteerList.size()){
-                                            Log.d(TAG,"Requestor was Volunteer");
-                                            marker.setIcon(bitmapDescriptorFromVector(mycontext,R.drawable.baseline_volunteer_location_on_24));
-                                            volunteerList.get(position).marker = marker;
+                                            Log.d(TAG,"Volunteer Requestor Removed: "+requestor.getUserId());
+                                            marker = volunteerList.get(position).marker;
+                                            marker.remove();
+                                            volunteerList.get(position).setUsertype("volunteer");
+                                            volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
+                                                            .position(latlng)
+                                                            .title("Volunteer")
+                                                            .icon(bitmapDescriptorFromVector(mycontext, R.drawable.baseline_volunteer_location_on_24)));
                                         }
                                     }
                                 });
                             }
                         }
                         else{
+                            marker = requestor.marker;
                             if(getActivity()!=null){
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        Log.d(TAG,"Requestor Removed: "+requestor.getUserId());
                                         marker.remove();
                                     }
                                 });
@@ -341,53 +352,67 @@ public class MapFragment extends Fragment {
                             int i;
                             for(i = 0; i < requestorList.size(); i++){
                                 Requestor requestor = requestorList.get(i);
-                                int position = findVolunteer(requestor.getUserId());
                                 if(requestor.getUserId().equals(document.get("userId"))){
-                                    if(position != -1){
-                                        Log.v(TAG,"Already volunteer");
-                                        volunteerList.get(position).setUsertype("volunteer");
-                                        volunteerList.get(position).marker.setIcon(bitmapDescriptorFromVector(mycontext,R.drawable.trigger));
-                                        requestor.marker = volunteerList.get(position).marker;
-                                    }
                                     LatLng latLng = new LatLng(Double.parseDouble(document.get("Latitude").toString()), Double.parseDouble(document.get("Longitude").toString()));
-                                    //Log.d(TAG, "Existing Requestor : "+document.get("userId").toString());
                                     if (distance(latLng, cur_position) < 2.5) {
-                                        Log.v(TAG, "Requestor updated: "+document.get("userId").toString());
+
                                         requestor.setLatitude(document.get("Latitude").toString());
                                         requestor.setLongitude(document.get("Longitude").toString());
-                                        Marker marker = requestor.getMarker();
-                                        marker.setPosition(new LatLng(Double.parseDouble(document.get("Latitude").toString()), Double.parseDouble(document.get("Longitude").toString())));
+                                        int position = findVolunteer(requestor.getUserId());
                                         requestor.flag = currflag1;
+
+                                        if(position != -1){
+                                            Log.d(TAG,"Volunteer Requestor Updated: "+volunteerList.get(position).getUserId());
+                                            if(!volunteerList.get(position).getUsertype().equals("requestor")){
+                                                Log.d(TAG,"Volunteer --> Requestor");
+                                                volunteerList.get(position).setUsertype("requestor");
+                                                volunteerList.get(position).marker.remove();
+                                                volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
+                                                        .position(latLng)
+                                                        .title("In Emergency")
+                                                        .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
+                                                //requestor.marker = volunteerList.get(position).marker;
+                                            }
+                                        }
+                                        else{
+                                            Log.d(TAG, "Requestor updated: "+document.get("userId").toString());
+                                            Marker marker = requestor.getMarker();
+                                            marker.setPosition(new LatLng(Double.parseDouble(document.get("Latitude").toString()), Double.parseDouble(document.get("Longitude").toString())));
+                                        }
                                     }
                                     break;
                                 }
                             }
                             if(i == requestorList.size()){
                                 LatLng latLng = new LatLng(Double.parseDouble(document.get("Latitude").toString()), Double.parseDouble(document.get("Longitude").toString()));
-                                //Log.d(TAG,"Checking "+document.get("userId").toString());
                                 if (distance(latLng, cur_position) < 2.5) {
+
                                     Requestor requestor = new Requestor();
                                     requestor.setRequestId(document.getId());
                                     requestor.setUserId(document.get("userId").toString());
-                                    int position = findVolunteer(requestor.getUserId());
                                     requestor.setLatitude(document.get("Latitude").toString());
                                     requestor.setLongitude(document.get("Longitude").toString());
                                     requestor.flag = currflag1;
+
+                                    int position = findVolunteer(requestor.getUserId());
                                     if(position != -1){
-                                        Log.v(TAG,"Already volunteer");
-                                        volunteerList.get(position).setUsertype("volunteer");
-                                        volunteerList.get(position).marker.setPosition(latLng);
-                                        volunteerList.get(position).marker.setIcon(bitmapDescriptorFromVector(mycontext,R.drawable.trigger));
-                                        requestor.marker = volunteerList.get(position).marker;
+                                        volunteerList.get(position).setUsertype("requestor");
+                                        volunteerList.get(position).marker.remove();
+                                        volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
+                                                .position(latLng)
+                                                .title("In Emergency")
+                                                .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
+                                        //requestor.marker = volunteerList.get(position).marker;
+                                        Log.d(TAG,"Volunteer Requestor Added: "+document.get("userId").toString());
                                     }
                                     else{
                                         requestor.marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
                                                 .title("In Emergency")
                                                 .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
+                                        Log.d(TAG,"Requestor Added: "+document.get("userId").toString());
                                     }
                                     requestorList.add(requestor);
-                                    Log.d(TAG,"Requestor Added: "+document.get("userId").toString());
                                 }
                             }
                         }

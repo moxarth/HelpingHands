@@ -374,7 +374,7 @@ public class MapFragment extends Fragment {
                                                 volunteerList.get(position).marker.remove();
                                                 volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
                                                         .position(latLng)
-                                                        .title("In Emergency")
+                                                        .title(requestor.getRequestId())
                                                         .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
                                                 //requestor.marker = volunteerList.get(position).marker;
                                             }
@@ -405,7 +405,7 @@ public class MapFragment extends Fragment {
                                         volunteerList.get(position).marker.remove();
                                         volunteerList.get(position).marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
-                                                .title("In Emergency")
+                                                .title(requestor.getRequestId())
                                                 .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
                                         //requestor.marker = volunteerList.get(position).marker;
                                         Log.d(TAG,"Volunteer Requestor Added: "+document.get("userId").toString());
@@ -413,7 +413,7 @@ public class MapFragment extends Fragment {
                                     else{
                                         requestor.marker = mMap.addMarker(new MarkerOptions()
                                                 .position(latLng)
-                                                .title("In Emergency")
+                                                .title(requestor.getRequestId())
                                                 .icon(bitmapDescriptorFromVector(mycontext, R.drawable.trigger)));
                                         Log.d(TAG,"Requestor Added: "+document.get("userId").toString());
                                     }
@@ -594,7 +594,6 @@ public class MapFragment extends Fragment {
     private View prepareInfoView(Marker marker, Activity myactivity){
         LayoutInflater inflater = myactivity.getLayoutInflater();
         View markerView = inflater.inflate(R.layout.markerview, null,false);
-
         return markerView;
     }
 
@@ -648,8 +647,33 @@ public class MapFragment extends Fragment {
 
                                 @Override
                                 public View getInfoContents(Marker marker) {
-                                    if(marker.getTitle().equals("In Emergency")){return prepareInfoView(marker,getActivity());}
+                                    if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here"))
+                                    {
+                                        return prepareInfoView(marker,getActivity());
+                                    }
                                     else{return null;}
+                                }
+                            });
+                            mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+                                @Override
+                                public void onInfoWindowClick(Marker marker) {
+                                    if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here"))
+                                    {
+                                        final String id = marker.getTitle();
+                                        Log.v("custome",id);
+                                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                        db.collection("emergency_requests").document(id).update("Status","Accepted","VolunteerID",user.getUserid(),"VolunteerNo",user.getContactnumber()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    Toast.makeText(getActivity(),"Request Accepted",Toast.LENGTH_SHORT).show();
+                                                }
+                                                else{
+                                                    Log.v(TAG,"Error");
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
                             });
                             mMap.setMapType(MAP_TYPE_NORMAL);

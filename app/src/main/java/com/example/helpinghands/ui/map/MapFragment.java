@@ -656,7 +656,7 @@ public class MapFragment extends Fragment {
                             });
                             mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
                                 @Override
-                                public void onInfoWindowClick(Marker marker) {
+                                public void onInfoWindowClick(final Marker marker) {
                                     if(!marker.getTitle().equals("Volunteer") && !marker.getTitle().equals("You are here"))
                                     {
                                         final String id = marker.getTitle();
@@ -667,6 +667,10 @@ public class MapFragment extends Fragment {
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
                                                     Toast.makeText(getActivity(),"Request Accepted",Toast.LENGTH_SHORT).show();
+                                                    Marker newmarker = mMap.addMarker(new MarkerOptions()
+                                                            .position(marker.getPosition())
+                                                            .title(marker.getTitle())
+                                                            .icon(bitmapDescriptorFromVector(mycontext, R.drawable.acceptedrequest)));
                                                 }
                                                 else{
                                                     Log.v(TAG,"Error");

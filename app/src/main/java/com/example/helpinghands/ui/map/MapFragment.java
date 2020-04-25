@@ -643,13 +643,13 @@ public class MapFragment extends Fragment {
                             mMap.setInfoWindowAdapter(new InfoWindowAdapter() {
                                 @Override
                                 public View getInfoWindow(Marker marker) {
-                                    //return null;
-                                    return prepareInfoView(marker,getActivity());
+                                    return null;
                                 }
 
                                 @Override
                                 public View getInfoContents(Marker marker) {
-                                    return null;
+                                    if(marker.getTitle().equals("In Emergency")){return prepareInfoView(marker,getActivity());}
+                                    else{return null;}
                                 }
                             });
                             mMap.setMapType(MAP_TYPE_NORMAL);

@@ -10,23 +10,16 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginVertical="4dp"
-            android:text=" Accept"
-            android:textColor="@color/colorPrimary"
-            android:textSize="15dp" />
-
-        <ImageButton
+        <Button
             android:id="@+id/imageButton3"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            app:srcCompat="@drawable/accept"
-            android:layout_marginHorizontal="2dp"
-            />
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:background="#ff0844"
+            android:text="ACCEPT"
+            android:textColor="#fff"
+            android:layout_margin="1dp"
+            android:textSize="11dp"/>
 
     </LinearLayout>
 </LinearLayout>

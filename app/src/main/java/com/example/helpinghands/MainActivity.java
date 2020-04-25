@@ -39,12 +39,21 @@ public class MainActivity extends AppCompatActivity {
         if (FragmentName != null) {
             if (FragmentName.equals("MapFrag")) {
                 Log.v("position","in changing room");
-                Fragment fragment = new MapFragment();
+                /*Fragment fragment = new MapFragment();
                 FragmentManager fragmentManager = this.getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.container, fragment);
                 fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                fragmentTransaction.commit();*/
+                NavController nc = Navigation.findNavController(this, R.id.nav_host_fragment);
+                PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_map).createPendingIntent();
+                try {
+                    Pin.send();
+                    this.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                } catch (PendingIntent.CanceledException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
         super.onCreate(savedInstanceState);

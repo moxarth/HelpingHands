@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +31,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import com.example.helpinghands.BGDatabaseListenerService;
 import com.example.helpinghands.BackgroundService;
 import com.example.helpinghands.MainActivity;
@@ -531,6 +535,17 @@ public class HomeFragment extends Fragment {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if(task.getResult().size() > 0){
                                     Toast.makeText(getActivity(), "Cannot Broadcast Emergency Signal", Toast.LENGTH_SHORT).show();
+                                    NavController nc = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+                                    PendingIntent Pin = nc.createDeepLink().setDestination(R.id.navigation_requests).createPendingIntent();
+                                    try {
+                                        Pin.send();
+                                        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                                    } catch (PendingIntent.CanceledException e) {
+                                        e.printStackTrace();
+                                    }
+
+
+
                                 }
                                 else {
                                     final FirebaseFirestore db = FirebaseFirestore.getInstance();

@@ -49,8 +49,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class HomeFragment extends Fragment {
     static FirebaseFirestore db;
     static Address address;
     static User user;
-    public static String vid ="initial";
+    public static String vid = "initial";
 
     public LatLng locationfetch(){
         locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
@@ -126,6 +128,24 @@ public class HomeFragment extends Fragment {
         myuser.setlcity(myaddress.getLocality());
         Log.v(TAG,"Setting Locality: "+myaddress.getLocality());
         db.collection("user_details").document(myuser.getUserid()).update("lcity",myaddress.getLocality());
+    }
+
+    public void GPS_DisableAlert(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage("It seems GPS is disabled. You need to enable GPS location to access map")
+                .setCancelable(false)
+                .setPositiveButton("Turn on", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
     public boolean checkInternetStatus(){
@@ -516,7 +536,7 @@ public class HomeFragment extends Fragment {
                     if (!checkInternetStatus()) { Internet_DisableAlert(); }
                     else {
                         final User user = new User(getActivity());
-                        db.collection("emergency_requests").whereEqualTo("userId",user.getUserid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        db.collection("emergency_requests").whereEqualTo("userId",user.getUserid()).whereEqualTo("Status","Active").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if(task.getResult().size() > 0){
@@ -537,8 +557,28 @@ public class HomeFragment extends Fragment {
                                     ERequest.put("created", FieldValue.serverTimestamp());
                                     db.collection("emergency_requests").add(ERequest).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                         @Override
-                                        public void onSuccess(DocumentReference documentReference) {
+                                        public void onSuccess(final DocumentReference documentReference) {
+
                                             Toast.makeText(getActivity(), "Emergency Request Broadcasted", Toast.LENGTH_SHORT).show();
+                                            Thread t = new Thread(){
+                                                public void run(){
+                                                    while (vid.equals("initial")) {
+                                                        Log.d("HomeLOG", "Thread Running");
+                                                        db.collection("emergency_requests").document(documentReference.getId()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if(task.isSuccessful()){
+                                                                    vid = task.getResult().get("VolunteerID").toString();
+                                                                    Log.v("HomeLOG","Vid is: " + vid);
+                                                                    if(vid == null){
+                                                                        vid = "initial";
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            };
                                         }
                                     });
                                 }

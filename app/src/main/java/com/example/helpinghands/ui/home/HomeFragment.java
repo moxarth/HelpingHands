@@ -569,7 +569,7 @@ public class HomeFragment extends Fragment {
                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                                 if(task.isSuccessful()){
                                                                     vid = task.getResult().get("VolunteerID").toString();
-                                                                    Log.v("HomeLOG","Vid is: " + vid);
+                                                                    Log.v("mycustomelog","Vid is: " + vid);
                                                                     if(vid == null){
                                                                         vid = "initial";
                                                                     }

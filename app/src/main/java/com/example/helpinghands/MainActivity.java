@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+        // get the data from intent
         String FragmentName = getIntent().getStringExtra("FragmentName");
         Log.v("position","First" + FragmentName);
         if (FragmentName != null) {
